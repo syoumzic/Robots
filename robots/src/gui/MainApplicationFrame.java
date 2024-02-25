@@ -5,6 +5,7 @@ import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.Locale;
 
 import javax.swing.*;
 
@@ -170,9 +171,17 @@ public class MainApplicationFrame extends JFrame
     }
 
     private void confirmExit() {
-        int option = JOptionPane.showConfirmDialog(this,
-                "Вы уверены, что хотите выйти из приложения?",
-                "Подтверждение выхода", JOptionPane.YES_NO_OPTION);
+        Object[] options1 = {"Да", "Нет"};
+
+        int option = JOptionPane.showOptionDialog(null,
+                "Вы действительно хотите выйти?",
+                "Подтверждение выхода",
+                JOptionPane.YES_NO_CANCEL_OPTION,
+                JOptionPane.PLAIN_MESSAGE,
+                null,
+                options1,
+                null);
+
         if (option == JOptionPane.YES_OPTION) {
             dispose();
         }
