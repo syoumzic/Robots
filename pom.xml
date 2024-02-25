@@ -33,7 +33,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>gui.RobotsProgram</mainClass><!-- Путь к вашему главному классу -->
+                            <mainClass>gui.RobotsProgram</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
