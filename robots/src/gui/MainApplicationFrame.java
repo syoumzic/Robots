@@ -68,12 +68,12 @@ public class MainApplicationFrame extends JFrame
     
 //    protected JMenuBar createMenuBar() {
 //        JMenuBar menuBar = new JMenuBar();
-// 
+//
 //        //Set up the lone menu.
 //        JMenu menu = new JMenu("Document");
 //        menu.setMnemonic(KeyEvent.VK_D);
 //        menuBar.add(menu);
-// 
+//
 //        //Set up the first menu item.
 //        JMenuItem menuItem = new JMenuItem("New");
 //        menuItem.setMnemonic(KeyEvent.VK_N);
@@ -82,7 +82,7 @@ public class MainApplicationFrame extends JFrame
 //        menuItem.setActionCommand("new");
 ////        menuItem.addActionListener(this);
 //        menu.add(menuItem);
-// 
+//
 //        //Set up the second menu item.
 //        menuItem = new JMenuItem("Quit");
 //        menuItem.setMnemonic(KeyEvent.VK_Q);
@@ -91,7 +91,7 @@ public class MainApplicationFrame extends JFrame
 //        menuItem.setActionCommand("quit");
 ////        menuItem.addActionListener(this);
 //        menu.add(menuItem);
-// 
+//
 //        return menuBar;
 //    }
     
@@ -135,8 +135,23 @@ public class MainApplicationFrame extends JFrame
             testMenu.add(addLogMessageItem);
         }
 
+        JMenu actionMenu = new JMenu("Действия");
+        actionMenu.setMnemonic(KeyEvent.VK_A);
+        actionMenu.getAccessibleContext().setAccessibleDescription(
+                "Действия с приложением");
+
+        {
+            JMenuItem exitItem = new JMenuItem("Выход", KeyEvent.VK_E);
+            exitItem.addActionListener((event) -> {
+                System.exit(0);
+            });
+            actionMenu.add(exitItem);
+        }
+
         menuBar.add(lookAndFeelMenu);
         menuBar.add(testMenu);
+        menuBar.add(actionMenu);
+
         return menuBar;
     }
     
