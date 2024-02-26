@@ -5,7 +5,6 @@ import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.Locale;
 
 import javax.swing.*;
 
@@ -170,6 +169,9 @@ public class MainApplicationFrame extends JFrame
         }
     }
 
+    /**
+     * Метод подтверждения выхода
+     */
     private void confirmExit() {
         Object[] options1 = {"Да", "Нет"};
 
@@ -183,6 +185,7 @@ public class MainApplicationFrame extends JFrame
                 null);
 
         if (option == JOptionPane.YES_OPTION) {
+            setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             dispose();
         }
     }
