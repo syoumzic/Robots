@@ -22,13 +22,10 @@ public class RobotsProgram
         MainApplicationFrame frame = new MainApplicationFrame();
           try {
             Data windowsPreferences = new DataManager();
-            windowsPreferences.loadFromFile("C:\\Users\\Noname\\windowsPreferences.txt");
+            windowsPreferences.loadFromFile(System.getProperty("user.home") + "/windowsPreferences.txt");
             frame.loadState(windowsPreferences);
-            System.out.print("файл удалось открыть!");
           } catch (IOException | NoSuchElementException e) {
-            e.printStackTrace();
             frame.setDefault();
-            System.out.print("файл открыть не удалось!");
           }
       });
     }

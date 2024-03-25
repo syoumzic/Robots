@@ -107,7 +107,7 @@ public class DataManager implements Data{
      */
     @Override
     public String getString(String name) {
-        return null;
+        return storage.get(name);
     }
 
     /**

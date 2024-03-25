@@ -59,13 +59,11 @@ public class GameWindow extends JInternalFrame implements Savable
     public void loadState(Data data) {
         setLocation(data.getInt("x"), data.getInt("y"));
         setSize(data.getInt("width"), data.getInt("height"));
-        //getExtendedState
+
         try{
             setIcon(data.getBoolean("isIcon"));
         }catch(PropertyVetoException e){
             //ignore
         }
-
-        System.out.println("состояния окна игры прописано");
     }
 }

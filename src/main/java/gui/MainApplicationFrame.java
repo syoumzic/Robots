@@ -19,7 +19,7 @@ public class MainApplicationFrame extends JFrame implements Savable
     private GameWindow gameWindow;
 
     public MainApplicationFrame() {
-        int inset = 50;        
+        int inset = 50;
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         setBounds(inset, inset,
             screenSize.width  - inset*2,
@@ -144,7 +144,7 @@ public class MainApplicationFrame extends JFrame implements Savable
 
         if (option == JOptionPane.YES_OPTION) {
             try {
-                this.getData().saveToFile("C:\\Users\\Noname\\windowsPreferences.txt");
+                this.getData().saveToFile(System.getProperty("user.home") + "/windowsPreferences.txt");
             }catch(IOException e){
                 //ignore
             }
@@ -172,7 +172,6 @@ public class MainApplicationFrame extends JFrame implements Savable
     public void loadState(Data data) {
         logWindow.loadState(data.getData("logWindow"));
         gameWindow.loadState(data.getData("gameWindow"));
-        System.out.println("все состояния прописаны");
     }
 
     /**

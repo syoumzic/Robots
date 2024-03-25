@@ -39,28 +39,6 @@ public class LogWindow extends JInternalFrame implements LogChangeListener, Sava
         updateLogContent();
     }
 
-    public LogWindow(Data preferances)
-    {
-        super("Протокол работы", true, true, true, true);
-
-        setLocation(10,10);
-        setSize(300, 800);
-        setMinimumSize(getSize());
-        pack();
-        Logger.debug("Протокол работает");
-
-        m_logSource = Logger.getDefaultLogSource();
-        m_logSource.registerListener(this);
-        m_logContent = new TextArea("");
-        m_logContent.setSize(200, 500);
-
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.add(m_logContent, BorderLayout.CENTER);
-        getContentPane().add(panel);
-        pack();
-        updateLogContent();
-    }
-
     private void updateLogContent()
     {
         StringBuilder content = new StringBuilder();
@@ -100,8 +78,6 @@ public class LogWindow extends JInternalFrame implements LogChangeListener, Sava
         }catch(PropertyVetoException e){
             //ignore
         }
-
-        System.out.println("состояния логера прописано");
     }
 
     /**
