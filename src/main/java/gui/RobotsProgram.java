@@ -1,9 +1,11 @@
 package gui;
 
-import java.awt.Frame;
+import data.Data;
+import data.DataManager;
 
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
+import javax.swing.*;
+import java.io.IOException;
+import java.util.NoSuchElementException;
 
 public class RobotsProgram
 {
@@ -18,8 +20,13 @@ public class RobotsProgram
       }
       SwingUtilities.invokeLater(() -> {
         MainApplicationFrame frame = new MainApplicationFrame();
-        frame.pack();
-        frame.setVisible(true);
-        frame.setExtendedState(Frame.MAXIMIZED_BOTH);
+          try {
+            Data windowsPreferences = new DataManager();
+            windowsPreferences.loadFromFile(System.getProperty("user.home") + "/windowsPreferences.txt");
+            frame.loadState(windowsPreferences);
+          } catch (IOException | NoSuchElementException e) {
+            frame.setDefault();
+          }
       });
-    }}
+    }
+}

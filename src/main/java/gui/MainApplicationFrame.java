@@ -1,34 +1,36 @@
 package gui;
 
-import java.awt.Dimension;
-import java.awt.Toolkit;
+import data.Data;
+import data.DataManager;
+import data.Savable;
+import log.Logger;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.IOException;
 
-import javax.swing.*;
-
-import log.Logger;
-
-public class MainApplicationFrame extends JFrame
+public class MainApplicationFrame extends JFrame implements Savable
 {
     private final JDesktopPane desktopPane = new JDesktopPane();
-    
+    private LogWindow logWindow;
+    private GameWindow gameWindow;
+
     public MainApplicationFrame() {
-        int inset = 50;        
+        int inset = 50;
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         setBounds(inset, inset,
             screenSize.width  - inset*2,
             screenSize.height - inset*2);
 
         setContentPane(desktopPane);
-        
-        
-        LogWindow logWindow = createLogWindow();
+
+        logWindow = new LogWindow();
         addWindow(logWindow);
 
-        GameWindow gameWindow = new GameWindow();
-        gameWindow.setSize(400,  400);
+        gameWindow = new GameWindow();
         addWindow(gameWindow);
 
         setJMenuBar(generateMenuBar());
@@ -39,17 +41,10 @@ public class MainApplicationFrame extends JFrame
                 confirmExit();
             }
         });
-    }
-    
-    protected LogWindow createLogWindow()
-    {
-        LogWindow logWindow = new LogWindow(Logger.getDefaultLogSource());
-        logWindow.setLocation(10,10);
-        logWindow.setSize(300, 800);
-        setMinimumSize(logWindow.getSize());
-        logWindow.pack();
-        Logger.debug("Протокол работает");
-        return logWindow;
+
+        pack();
+        setVisible(true);
+        setExtendedState(Frame.MAXIMIZED_BOTH);
     }
     
     protected void addWindow(JInternalFrame frame)
@@ -148,8 +143,43 @@ public class MainApplicationFrame extends JFrame
                 null);
 
         if (option == JOptionPane.YES_OPTION) {
+            try {
+                this.getData().saveToFile(System.getProperty("user.home") + "/windowsPreferences.txt");
+            }catch(IOException e){
+                //ignore
+            }
             setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             dispose();
         }
+    }
+    /**
+     * Возвращает себя как объект данных
+     */
+    @Override
+    public Data getData(){
+        Data windowsPreferences = new DataManager();
+
+        windowsPreferences.setData("logWindow", logWindow.getData());
+        windowsPreferences.setData("gameWindow", gameWindow.getData());
+
+        return windowsPreferences;
+    }
+
+    /**
+     * Загружает объект по данным
+     */
+    @Override
+    public void loadState(Data data) {
+        logWindow.loadState(data.getData("logWindow"));
+        gameWindow.loadState(data.getData("gameWindow"));
+    }
+
+    /**
+     * Устанавлеивает объект в значение по умолчанию
+     */
+    @Override
+    public void setDefault() {
+        logWindow.setDefault();
+        gameWindow.setDefault();
     }
 }
