@@ -1,29 +1,26 @@
 package gui;
 
-import data.Data;
-import data.DataManager;
-import data.Savable;
 import log.LogChangeListener;
 import log.LogEntry;
 import log.LogWindowSource;
 import log.Logger;
+import utils.Data;
+import utils.Savable;
+import utils.WindowsManager;
 
 import javax.swing.*;
 import java.awt.*;
-import java.beans.PropertyVetoException;
+import java.util.NoSuchElementException;
 
-public class LogWindow extends JInternalFrame implements LogChangeListener, Savable
-{
+public class LogWindow extends JInternalFrame implements LogChangeListener, Savable {
     private LogWindowSource m_logSource;
     private TextArea m_logContent;
+    private WindowsManager windowsManager;
 
-    public LogWindow()
-    {
+    public LogWindow(WindowsManager windowsManager) {
         super("Протокол работы", true, true, true, true);
+        this.windowsManager = windowsManager;
 
-        setLocation(10,10);
-        setSize(300, 800);
-        setMinimumSize(getSize());
         pack();
         Logger.debug("Протокол работает");
 
@@ -31,73 +28,40 @@ public class LogWindow extends JInternalFrame implements LogChangeListener, Sava
         m_logSource.registerListener(this);
         m_logContent = new TextArea("");
         m_logContent.setSize(200, 500);
-        
+
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(m_logContent, BorderLayout.CENTER);
         getContentPane().add(panel);
         pack();
         updateLogContent();
+
+        setLocation(10, 10);
+        setSize(300, 800);
     }
 
-    private void updateLogContent()
-    {
+    private void updateLogContent() {
         StringBuilder content = new StringBuilder();
-        for (LogEntry entry : m_logSource.all())
-        {
+        for (LogEntry entry : m_logSource.all()) {
             content.append(entry.getMessage()).append("\n");
         }
         m_logContent.setText(content.toString());
         m_logContent.invalidate();
     }
-    
+
     @Override
-    public void onLogChanged()
-    {
+    public void onLogChanged() {
         EventQueue.invokeLater(this::updateLogContent);
     }
 
-    /**
-     * Позволяет сохранять текущий объект
-     */
     @Override
-    public void setDefault() {
-        setLocation(10,10);
-        setSize(300, 800);
+    public void saveState(Data windowsState) {
+        Data data = windowsManager.toData(this);
+        windowsState.setData("logWindow", data);
     }
 
-    /**
-     * Позволяет загружать текущий объект
-     */
     @Override
-    public void loadState(Data data) {
-        setLocation(data.getInt("x"), data.getInt("y"));
-        setSize(data.getInt("width"), data.getInt("height"));
-
-        try{
-            setIcon(data.getBoolean("isIcon"));
-        }catch(PropertyVetoException e){
-            //ignore
-        }
-    }
-
-    /**
-     * Возвращает себя как объект данных
-     */
-    @Override
-    public Data getData() {
-        Data data = new DataManager();
-
-        Point position = getLocation();
-        data.setInt("x", position.x);
-        data.setInt("y", position.y);
-
-        Dimension size = getSize();
-        data.setInt("width", size.width);
-        data.setInt("height", size.height);
-
-        boolean isIcon = isIcon();
-        data.setBoolean("isIcon", isIcon);
-
-        return data;
+    public void loadState(Data windowsState) throws NoSuchElementException {
+        Data data = windowsState.getData("logWindow");
+        windowsManager.loadComponent(this, data);
     }
 }

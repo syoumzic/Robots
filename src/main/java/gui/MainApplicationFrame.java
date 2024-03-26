@@ -1,9 +1,10 @@
 package gui;
 
-import data.Data;
-import data.DataManager;
-import data.Savable;
+import utils.Data;
+import utils.DataManager;
+import utils.Savable;
 import log.Logger;
+import utils.WindowsManager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -11,12 +12,12 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
+import java.util.NoSuchElementException;
 
 public class MainApplicationFrame extends JFrame implements Savable
 {
     private final JDesktopPane desktopPane = new JDesktopPane();
-    private LogWindow logWindow;
-    private GameWindow gameWindow;
+    private final DataManager dataManager = new DataManager();
 
     public MainApplicationFrame() {
         int inset = 50;
@@ -27,11 +28,17 @@ public class MainApplicationFrame extends JFrame implements Savable
 
         setContentPane(desktopPane);
 
-        logWindow = new LogWindow();
-        addWindow(logWindow);
+        WindowsManager windowsManager = new WindowsManager();
 
-        gameWindow = new GameWindow();
-        addWindow(gameWindow);
+        addWindow(new LogWindow(windowsManager));
+        addWindow(new GameWindow(windowsManager));
+
+        try {
+            Data windowsState = dataManager.loadData();
+            loadState(windowsState);
+        }catch(NoSuchElementException | IOException e){
+            //ignore
+        }
 
         setJMenuBar(generateMenuBar());
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -143,43 +150,43 @@ public class MainApplicationFrame extends JFrame implements Savable
                 null);
 
         if (option == JOptionPane.YES_OPTION) {
-            try {
-                this.getData().saveToFile(System.getProperty("user.home") + "/windowsPreferences.txt");
-            }catch(IOException e){
-                //ignore
-            }
+            exitAction();
             setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             dispose();
         }
     }
-    /**
-     * Возвращает себя как объект данных
-     */
-    @Override
-    public Data getData(){
-        Data windowsPreferences = new DataManager();
 
-        windowsPreferences.setData("logWindow", logWindow.getData());
-        windowsPreferences.setData("gameWindow", gameWindow.getData());
-
-        return windowsPreferences;
+    private void exitAction(){
+        Data windowsState = new Data();
+        saveState(windowsState);
+        try {
+            dataManager.saveData(windowsState);
+        }catch(IOException e){
+            //ignore
+        }
     }
 
     /**
-     * Загружает объект по данным
+     * Сохраняет своё состояние
      */
     @Override
-    public void loadState(Data data) {
-        logWindow.loadState(data.getData("logWindow"));
-        gameWindow.loadState(data.getData("gameWindow"));
+    public void saveState(Data windowsState) {
+        for(JInternalFrame component: desktopPane.getAllFrames()){
+            if(component instanceof Savable savable){
+                savable.saveState(windowsState);
+            }
+        }
     }
 
     /**
-     * Устанавлеивает объект в значение по умолчанию
+     * Восстанавливает своё состояние
      */
     @Override
-    public void setDefault() {
-        logWindow.setDefault();
-        gameWindow.setDefault();
+    public void loadState(Data windowsState) throws NoSuchElementException {
+        for(JInternalFrame component: desktopPane.getAllFrames()){
+            if(component instanceof Savable savable){
+                savable.loadState(windowsState);
+            }
+        }
     }
 }
