@@ -1,9 +1,5 @@
 package utils;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -69,6 +65,10 @@ public class Data{
      */
     public Data getData(String name) throws NoSuchElementException {
         String rawData = storage.get(name);
+
+        if(rawData == null)
+            throw new NoSuchElementException();
+
         Data outData = new Data();
 
         int startIndex = rawData.indexOf('{');
@@ -106,37 +106,9 @@ public class Data{
     }
 
     /**
-     * Сохраняет в файл текущий объект
-     */
-    public void saveToFile(String path) throws IOException {
-        try (PrintWriter writer = new PrintWriter(path)) {
-            for (Map.Entry<String, String> entry : storage.entrySet()) {
-                String line = entry.getKey() + ":" + entry.getValue();
-                writer.println(line);
-            }
-        }
-    }
-
-    /**
-     * Предоставляет итерируемый список
+     * Предоставляет итерируемое множество
      */
     public Set<Map.Entry<String, String>> entrySet() {
         return storage.entrySet();
-    }
-
-    /**
-     * Загружает из файла текущий объект
-     */
-    public void loadFromFile(String path) throws IOException {
-        try (BufferedReader reader = new BufferedReader(new FileReader(path))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                int pointsIndex = line.indexOf(':');
-
-                if(pointsIndex == -1) throw new IOException();
-
-                storage.put(line.substring(0, pointsIndex), line.substring(pointsIndex+1));
-            }
-        }
     }
 }

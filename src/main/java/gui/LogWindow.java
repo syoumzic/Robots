@@ -4,7 +4,6 @@ import log.LogChangeListener;
 import log.LogEntry;
 import log.LogWindowSource;
 import log.Logger;
-import utils.Data;
 import utils.Savable;
 import utils.WindowsManager;
 
@@ -35,8 +34,12 @@ public class LogWindow extends JInternalFrame implements LogChangeListener, Sava
         pack();
         updateLogContent();
 
-        setLocation(10, 10);
-        setSize(300, 800);
+        try {
+            loadState();
+        } catch (NoSuchElementException e) {
+            setLocation(10, 10);
+            setSize(300, 800);
+        }
     }
 
     private void updateLogContent() {
@@ -54,14 +57,12 @@ public class LogWindow extends JInternalFrame implements LogChangeListener, Sava
     }
 
     @Override
-    public void saveState(Data windowsState) {
-        Data data = windowsManager.toData(this);
-        windowsState.setData("logWindow", data);
+    public void saveState() {
+        windowsManager.setWindow("logWindow", this);
     }
 
     @Override
-    public void loadState(Data windowsState) throws NoSuchElementException {
-        Data data = windowsState.getData("logWindow");
-        windowsManager.loadComponent(this, data);
+    public void loadState() throws NoSuchElementException{
+        windowsManager.loadWindow("logWindow", this);
     }
 }

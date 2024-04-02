@@ -1,47 +1,84 @@
 package utils;
 
 import javax.swing.*;
+import java.awt.*;
 import java.beans.PropertyVetoException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 /**
- * Сущность извлекающая состояние JInternalFrame в объект данных (класс Data)
+ * Сущность для работы с окнами
  */
-public class WindowsManager {
+public class WindowsManager{
+    private final Data storage = new Data();
+    final String path = System.getProperty("user.home") + "/windowsPreferences.txt";
 
     /**
-     * Возвращает объект данных исходя из состояния компонента
+     * Сохраняет состояние компонента в хранилище
      */
-    public Data toData(JInternalFrame component) {
-        Data data = new Data();
-        data.setInt("x", component.getX());
-        data.setInt("y", component.getY());
-        data.setInt("width", component.getWidth());
-        data.setInt("height", component.getHeight());
+    public void setWindow(String name, Component component){
+        Data windowData = new Data();
+        windowData.setInt("x", component.getX());
+        windowData.setInt("y", component.getY());
+        windowData.setInt("width", component.getWidth());
+        windowData.setInt("height", component.getHeight());
 
-        data.setBoolean("isIcon", component.isIcon());
+        if(component instanceof JInternalFrame jInternalFrame)
+            windowData.setBoolean("isIcon", jInternalFrame.isIcon());
 
-        return data;
+        storage.setData(name, windowData);
     }
 
     /**
-     * Востанавливает состояние компонента по объекту данных
+     * Востанавливает состояние компонента из хранилища
      *
-     * @throws NoSuchElementException выкидывается, если в объекте данных нет необходимого поля
+     * @throws NoSuchElementException в объекте данных нет необходимого поля
      */
-    public void loadComponent(JInternalFrame component, Data data) throws NoSuchElementException {
+    public void loadWindow(String name, Component component) throws NoSuchElementException{
+        Data windowData = storage.getData(name);
+
         component.setLocation(
-                data.getInt("x"),
-                data.getInt("y"));
+                windowData.getInt("x"),
+                windowData.getInt("y"));
 
         component.setSize(
-                data.getInt("width"),
-                data.getInt("height"));
+                windowData.getInt("width"),
+                windowData.getInt("height"));
 
-        try {
-            component.setIcon(data.getBoolean("isIcon"));
-        } catch (PropertyVetoException e) {
-            //ignore
+        if(component instanceof JInternalFrame jInternalFrame) {
+            try {
+                jInternalFrame.setIcon(windowData.getBoolean("isIcon"));
+            } catch (PropertyVetoException e) {
+                //ignore
+            }
+        }
+    }
+
+    /**
+     * Сохраняет в файл состояние внутренних окон
+     */
+    public void saveWindowsPreferences() throws IOException {
+        try(PrintWriter writer = new PrintWriter(new FileWriter(path))){
+            for (Map.Entry<String, String> entry: storage.entrySet()) {
+                String line = entry.getKey() + ":" + entry.getValue();
+                writer.println(line);
+            }
+        }
+    }
+
+    /**
+     * Восстанавливает из файла состяние внутренних окон
+     */
+    public void loadWindowPreferences() throws IOException {
+        for(String line: Files.readAllLines(Paths.get(path))){
+            int pointsIndex = line.indexOf(':');
+            if(pointsIndex == -1) throw new IOException();
+            storage.setString(line.substring(0, pointsIndex), line.substring(pointsIndex+1));
         }
     }
 }

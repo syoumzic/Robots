@@ -1,6 +1,5 @@
 package gui;
 
-import utils.Data;
 import utils.Savable;
 import utils.WindowsManager;
 
@@ -22,19 +21,21 @@ public class GameWindow extends JInternalFrame implements Savable
         panel.add(m_visualizer, BorderLayout.CENTER);
         getContentPane().add(panel);
 
-        setLocation(350, 10);
-        setSize(400,  400);
+        try{
+            loadState();
+        }catch(NoSuchElementException e){
+            setLocation(350, 20);
+            setSize(400, 400);
+        }
     }
 
     @Override
-    public void saveState(Data windowsState) {
-        Data data = windowsManager.toData(this);
-        windowsState.setData("gameWindow", data);
+    public void saveState() {
+        windowsManager.setWindow("gameWindow", this);
     }
 
     @Override
-    public void loadState(Data windowsState) throws NoSuchElementException {
-        Data data = windowsState.getData("gameWindow");
-        windowsManager.loadComponent(this, data);
+    public void loadState() throws NoSuchElementException {
+        windowsManager.loadWindow("gameWindow", this);
     }
 }

@@ -7,14 +7,14 @@ import java.util.NoSuchElementException;
  */
 public interface Savable {
     /**
-     * Сохраняет своё состояние в переменную Data
+     * Сохраняет своё состояние
      */
-    void saveState(Data windowsState);
+    void saveState();
 
     /**
-     * Восстанавливает своё состояние по переменной Data
+     * Восстанавливает своё состояние
      *
      * @throws NoSuchElementException в данных нет необходимого поля
      */
-    void loadState(Data windowsState) throws NoSuchElementException;
+    void loadState() throws NoSuchElementException;
 }

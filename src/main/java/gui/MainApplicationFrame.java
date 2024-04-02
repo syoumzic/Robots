@@ -1,7 +1,5 @@
 package gui;
 
-import utils.Data;
-import utils.DataManager;
 import utils.Savable;
 import log.Logger;
 import utils.WindowsManager;
@@ -12,12 +10,11 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
-import java.util.NoSuchElementException;
 
-public class MainApplicationFrame extends JFrame implements Savable
+public class MainApplicationFrame extends JFrame
 {
     private final JDesktopPane desktopPane = new JDesktopPane();
-    private final DataManager dataManager = new DataManager();
+    private final WindowsManager windowsManager = new WindowsManager();
 
     public MainApplicationFrame() {
         int inset = 50;
@@ -28,17 +25,13 @@ public class MainApplicationFrame extends JFrame implements Savable
 
         setContentPane(desktopPane);
 
-        WindowsManager windowsManager = new WindowsManager();
-
-        addWindow(new LogWindow(windowsManager));
-        addWindow(new GameWindow(windowsManager));
-
         try {
-            Data windowsState = dataManager.loadData();
-            loadState(windowsState);
-        }catch(NoSuchElementException | IOException e){
+            windowsManager.loadWindowPreferences();
+        }catch(IOException e){
             //ignore
         }
+        addWindow(new LogWindow(windowsManager));
+        addWindow(new GameWindow(windowsManager));
 
         setJMenuBar(generateMenuBar());
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -150,42 +143,28 @@ public class MainApplicationFrame extends JFrame implements Savable
                 null);
 
         if (option == JOptionPane.YES_OPTION) {
-            exitAction();
+            saveState();
             setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             dispose();
         }
     }
 
-    private void exitAction(){
-        Data windowsState = new Data();
-        saveState(windowsState);
-        try {
-            dataManager.saveData(windowsState);
-        }catch(IOException e){
-            //ignore
-        }
-    }
-
     /**
-     * Сохраняет своё состояние
+     * Сохраняет состояние всех внутренних окон
      */
-    @Override
-    public void saveState(Data windowsState) {
-        for(JInternalFrame component: desktopPane.getAllFrames()){
-            if(component instanceof Savable savable){
-                savable.saveState(windowsState);
+    public void saveState() {
+        for (Component component : desktopPane.getComponents()) {
+            if (component instanceof Savable savable) {
+                savable.saveState();
             }
-        }
-    }
-
-    /**
-     * Восстанавливает своё состояние
-     */
-    @Override
-    public void loadState(Data windowsState) throws NoSuchElementException {
-        for(JInternalFrame component: desktopPane.getAllFrames()){
-            if(component instanceof Savable savable){
-                savable.loadState(windowsState);
+            else if (component instanceof JInternalFrame.JDesktopIcon icon) {
+                if (icon.getInternalFrame() instanceof Savable savable)
+                    savable.saveState();
+            }
+            try {
+                windowsManager.saveWindowsPreferences();
+            }catch (IOException e){
+                //ignore
             }
         }
     }
