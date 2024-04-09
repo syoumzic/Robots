@@ -7,6 +7,7 @@ import java.awt.Graphics2D;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
+import java.beans.PropertyChangeListener;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -15,11 +16,12 @@ import javax.swing.JPanel;
 /**
  * Движок для отображения робота
  */
-public class GameVisualizer extends JPanel {
+public class GameVisualizer extends JPanel{
     private final Timer m_timer = new Timer("events generator", true);
-    private GameEngine engine = new GameEngine();
+    private GameEngine engine;
 
-    public GameVisualizer() {
+    public GameVisualizer(PropertyChangeListener robotPositionWindow) {
+        engine = new GameEngine(robotPositionWindow);
         m_timer.schedule(new TimerTask() {
             @Override
             public void run() {

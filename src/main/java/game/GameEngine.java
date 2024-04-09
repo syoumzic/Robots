@@ -1,6 +1,8 @@
 package game;
 
 import java.awt.*;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 
 /**
  * Двиодок для управления роботом
@@ -10,7 +12,7 @@ public class GameEngine {
     private volatile double robotPositionY = 100;
     private volatile double robotDirection = 0;
 
-    private volatile int targetPositionX = 150;
+    private volatile int targetPositionX = 100;
     private volatile int targetPositionY = 100;
 
     private final double maxVelocity = 0.1;
@@ -18,6 +20,13 @@ public class GameEngine {
     private final double minTargetDistance = 0.5;
 
     private final double duration = 10;
+
+    private PropertyChangeSupport broadcast = new PropertyChangeSupport(this);
+
+    GameEngine(PropertyChangeListener gameWindow){
+        broadcast.addPropertyChangeListener(gameWindow);
+        sendPosition(robotPositionX, robotPositionY);
+    }
 
     /**
      * Рассчитывает расстояние от точки (x1, y1) до точки (x2, y2)
@@ -103,6 +112,7 @@ public class GameEngine {
         }
         robotPositionX = newX;
         robotPositionY = newY;
+        sendPosition(newX, newY);
         double newDirection = angleNormalize(robotDirection + angularVelocity * duration);
         robotDirection = newDirection;
     }
@@ -123,6 +133,13 @@ public class GameEngine {
      */
     public int round(double value) {
         return (int) (value + 0.5);
+    }
+
+    /**
+     * Разослать всем подписанным слушателям новые координаты
+     */
+    private void sendPosition(double x, double y){
+        broadcast.firePropertyChange("changePosition", null, new double[]{x, y});
     }
 
     public void setTargetPosition(Point p) {

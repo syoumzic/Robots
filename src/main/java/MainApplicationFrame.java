@@ -5,8 +5,8 @@ import java.awt.event.WindowEvent;
 
 import javax.swing.*;
 
-import com.sun.tools.javac.Main;
 import game.GameWindow;
+import game.RobotPositionWindow;
 import log.LogWindow;
 import menu.CustomMenuBar;
 import log.Logger;
@@ -28,12 +28,13 @@ public class MainApplicationFrame extends JFrame
         LogWindow logWindow = createLogWindow();
         addWindow(logWindow);
 
-        GameWindow gameWindow = new GameWindow();
+        RobotPositionWindow robotPositionWindow = new RobotPositionWindow();
+        addWindow(robotPositionWindow);
+
+        GameWindow gameWindow = new GameWindow(robotPositionWindow);
         gameWindow.setSize(400,  400);
         addWindow(gameWindow);
 
-        RobotPositionWindow robotPositionWindow = new RobotPositionWindow();
-        addWindow(robotPositionWindow);
 
         setJMenuBar(new CustomMenuBar(this));
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
