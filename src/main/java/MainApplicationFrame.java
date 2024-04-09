@@ -1,14 +1,14 @@
-package gui;
-
 import java.awt.Dimension;
 import java.awt.Toolkit;
-import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 import javax.swing.*;
 
-import gui.menu.CustomMenuBar;
+import com.sun.tools.javac.Main;
+import game.GameWindow;
+import log.LogWindow;
+import menu.CustomMenuBar;
 import log.Logger;
 
 public class MainApplicationFrame extends JFrame
@@ -31,6 +31,9 @@ public class MainApplicationFrame extends JFrame
         GameWindow gameWindow = new GameWindow();
         gameWindow.setSize(400,  400);
         addWindow(gameWindow);
+
+        RobotPositionWindow robotPositionWindow = new RobotPositionWindow();
+        addWindow(robotPositionWindow);
 
         setJMenuBar(new CustomMenuBar(this));
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);

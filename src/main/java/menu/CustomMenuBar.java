@@ -1,11 +1,6 @@
-package gui.menu;
-
-import gui.MainApplicationFrame;
-import log.Logger;
+package menu;
 
 import javax.swing.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.WindowEvent;
 
 public class CustomMenuBar extends JMenuBar {
     public CustomMenuBar(JFrame mainFrame){

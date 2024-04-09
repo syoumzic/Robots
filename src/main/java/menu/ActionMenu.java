@@ -1,6 +1,4 @@
-package gui.menu;
-
-import gui.MainApplicationFrame;
+package menu;
 
 import javax.swing.*;
 import java.awt.event.KeyEvent;
