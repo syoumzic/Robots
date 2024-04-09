@@ -110,6 +110,7 @@ public class GameEngine {
         if (!Double.isFinite(newY)) {
             newY = robotPositionY + velocity * duration * Math.sin(robotDirection);
         }
+        broadcast.firePropertyChange("changePosition", new double[]{robotPositionX, robotPositionY}, new double[]{newX, newY});
         robotPositionX = newX;
         robotPositionY = newY;
         sendPosition(newX, newY);

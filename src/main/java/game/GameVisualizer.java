@@ -8,8 +8,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.beans.PropertyChangeListener;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import javax.swing.JPanel;
 
@@ -17,23 +15,10 @@ import javax.swing.JPanel;
  * Движок для отображения робота
  */
 public class GameVisualizer extends JPanel{
-    private final Timer m_timer = new Timer("events generator", true);
     private GameEngine engine;
 
-    public GameVisualizer(PropertyChangeListener robotPositionWindow) {
-        engine = new GameEngine(robotPositionWindow);
-        m_timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                onRedrawEvent();
-            }
-        }, 0, 50);
-        m_timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                engine.onModelUpdateEvent();
-            }
-        }, 0, 10);
+    public GameVisualizer(GameEngine engine) {
+        this.engine = engine;
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -44,7 +29,7 @@ public class GameVisualizer extends JPanel{
         setDoubleBuffered(true);
     }
 
-    private void onRedrawEvent() {
+    public void onRedrawEvent() {
         EventQueue.invokeLater(this::repaint);
     }
 
