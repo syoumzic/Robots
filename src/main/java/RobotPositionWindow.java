@@ -1,10 +1,9 @@
-import log.LogEntry;
-
 import javax.swing.*;
 import java.awt.*;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 
+/**
+ * Окно показывающее текущие координаты робота
+ */
 public class RobotPositionWindow extends JInternalFrame{
     private TextArea textArea;
     RobotPositionWindow() {
@@ -21,6 +20,9 @@ public class RobotPositionWindow extends JInternalFrame{
         pack();
     }
 
+    /**
+     * Метод для обновления координат на окне
+     */
     void updateContent(double x, double y){
         textArea.setText("Координаты робота:\nx: %f\ny: %f".formatted(x, y));
         textArea.invalidate();

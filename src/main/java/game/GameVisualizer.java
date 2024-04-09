@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
@@ -13,6 +12,9 @@ import java.util.TimerTask;
 
 import javax.swing.JPanel;
 
+/**
+ * Движок для отображения робота
+ */
 public class GameVisualizer extends JPanel {
     private final Timer m_timer = new Timer("events generator", true);
     private GameEngine engine = new GameEngine();
@@ -40,10 +42,9 @@ public class GameVisualizer extends JPanel {
         setDoubleBuffered(true);
     }
 
-    protected void onRedrawEvent() {
+    private void onRedrawEvent() {
         EventQueue.invokeLater(this::repaint);
     }
-
 
     @Override
     public void paint(Graphics g) {

@@ -2,6 +2,9 @@ package game;
 
 import java.awt.*;
 
+/**
+ * Двиодок для управления роботом
+ */
 public class GameEngine {
     private volatile double robotPositionX = 100;
     private volatile double robotPositionY = 100;
@@ -12,44 +15,66 @@ public class GameEngine {
 
     private final double maxVelocity = 0.1;
     private final double maxAngularVelocity = 0.001;
+    private final double minTargetDistance = 0.5;
 
-    protected void setTargetPosition(Point p) {
-        targetPositionX = p.x;
-        targetPositionY = p.y;
-    }
+    private final double duration = 10;
 
+    /**
+     * Рассчитывает расстояние от точки (x1, y1) до точки (x2, y2)
+     */
     private double distance(double x1, double y1, double x2, double y2) {
         double diffX = x1 - x2;
         double diffY = y1 - y2;
         return Math.sqrt(diffX * diffX + diffY * diffY);
     }
 
+    /**
+     * Рассчитывает угол прямой от точки (fromX, fromY) до точки (toX, toY)
+     */
     private double angleTo(double fromX, double fromY, double toX, double toY) {
         double diffX = toX - fromX;
         double diffY = toY - fromY;
 
-        return asNormalizedRadians(Math.atan2(diffY, diffX));
+        return Math.atan2(diffY, diffX);
     }
 
-    protected void onModelUpdateEvent() {
-        double distance = distance(targetPositionX, targetPositionY,
-                robotPositionX, robotPositionY);
-        if (distance < 0.5) {
+    /**
+     * Обработка движения робота
+     */
+    public void onModelUpdateEvent() {
+        double distance = distance(targetPositionX, targetPositionY, robotPositionX, robotPositionY);
+        if (distance < minTargetDistance) {
             return;
         }
         double velocity = maxVelocity;
         double angleToTarget = angleTo(robotPositionX, robotPositionY, targetPositionX, targetPositionY);
         double angularVelocity = 0;
-        if (angleToTarget > robotDirection) {
-            angularVelocity = maxAngularVelocity;
-        }
-        if (angleToTarget < robotDirection) {
+
+        double dist1 = robotDirection - angleToTarget + Math.TAU;
+        double dist2 = Math.abs(robotDirection - angleToTarget);
+        double dist3 = -robotDirection + angleToTarget + Math.TAU;
+
+        double minDist = Math.min(dist1, Math.min(dist2, dist3));
+
+        if(dist1 < dist2 && dist1 < dist3){
             angularVelocity = -maxAngularVelocity;
         }
+        else if(dist3 < dist1 && dist3 < dist2){
+            angularVelocity = maxAngularVelocity;
+        }
+        else if(robotDirection > angleToTarget){
+            angularVelocity = -maxAngularVelocity;
+        }
+        else if(robotDirection < angleToTarget){
+            angularVelocity = maxAngularVelocity;
+        }
 
-        moveRobot(velocity, angularVelocity, 10);
+        moveRobot(velocity, angularVelocity);
     }
 
+    /**
+     * Ограничение значения переменной value от min до max
+     */
     private double applyLimits(double value, double min, double max) {
         if (value < min)
             return min;
@@ -58,7 +83,10 @@ public class GameEngine {
         return value;
     }
 
-    private void moveRobot(double velocity, double angularVelocity, double duration) {
+    /**
+     * Двигать роота с заданной скоростью и вращать с заданным углом поворота
+     */
+    private void moveRobot(double velocity, double angularVelocity) {
         velocity = applyLimits(velocity, 0, maxVelocity);
         angularVelocity = applyLimits(angularVelocity, -maxAngularVelocity, maxAngularVelocity);
         double newX = robotPositionX + velocity / angularVelocity *
@@ -75,22 +103,31 @@ public class GameEngine {
         }
         robotPositionX = newX;
         robotPositionY = newY;
-        double newDirection = asNormalizedRadians(robotDirection + angularVelocity * duration);
+        double newDirection = angleNormalize(robotDirection + angularVelocity * duration);
         robotDirection = newDirection;
     }
 
-    private double asNormalizedRadians(double angle) {
-        while (angle < 0) {
-            angle += 2 * Math.PI;
-        }
-        while (angle >= 2 * Math.PI) {
-            angle -= 2 * Math.PI;
-        }
+    /**
+     * Ограничение значения angle в диапазоне от -pi до pi
+     */
+    public double angleNormalize(double angle){
+        if(angle > Math.PI)
+            return angle - Math.TAU;
+        else if(angle < -Math.PI)
+            return angle + Math.TAU;
         return angle;
     }
 
-    int round(double value) {
+    /**
+     * Округление заданного числа
+     */
+    public int round(double value) {
         return (int) (value + 0.5);
+    }
+
+    public void setTargetPosition(Point p) {
+        targetPositionX = p.x;
+        targetPositionY = p.y;
     }
 
     public double getRobotPositionX() {
