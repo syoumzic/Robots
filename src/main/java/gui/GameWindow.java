@@ -20,6 +20,8 @@ public class GameWindow extends JInternalFrame implements Savable
     public GameWindow(PropertyChangeListener listener, WindowsManager windowsManager)
     {
         super("Игровое поле", true, true, true, true);
+        this.windowsManager = windowsManager;
+
         GameModel model = new GameModel(listener);
         GameVisualizer visualizer = new GameVisualizer(model);
         GameController controller = new GameController(this, visualizer, model);

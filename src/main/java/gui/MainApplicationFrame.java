@@ -21,7 +21,6 @@ import java.io.IOException;
 public class MainApplicationFrame extends JFrame
 {
     private final JDesktopPane desktopPane = new JDesktopPane();
-
     private final WindowsManager windowsManager = new WindowsManager();
 
     public MainApplicationFrame() {
@@ -33,20 +32,19 @@ public class MainApplicationFrame extends JFrame
 
         setContentPane(desktopPane);
 
-
-        LogWindow logWindow = createLogWindow();
-        addWindow(logWindow);
-
         try {
             windowsManager.loadWindowPreferences();
         }catch(IOException e){
             //ignore
         }
+
+        LogWindow logWindow = new LogWindow(windowsManager);
+        addWindow(logWindow);
+
         RobotPositionWindow robotPositionWindow = new RobotPositionWindow();
         addWindow(robotPositionWindow);
 
-        GameWindow gameWindow = new GameWindow(robotPositionWindow, robotPositionWindow);
-        gameWindow.setSize(400,  400);
+        GameWindow gameWindow = new GameWindow(robotPositionWindow, windowsManager);
         addWindow(gameWindow);
 
 
@@ -68,80 +66,6 @@ public class MainApplicationFrame extends JFrame
     {
         desktopPane.add(frame);
         frame.setVisible(true);
-    }
-    
-    private JMenuBar generateMenuBar()
-    {
-        JMenuBar menuBar = new JMenuBar();
-        
-        JMenu lookAndFeelMenu = new JMenu("Режим отображения");
-        lookAndFeelMenu.setMnemonic(KeyEvent.VK_V);
-        lookAndFeelMenu.getAccessibleContext().setAccessibleDescription(
-                "Управление режимом отображения приложения");
-        
-        {
-            JMenuItem systemLookAndFeel = new JMenuItem("Системная схема", KeyEvent.VK_S);
-            systemLookAndFeel.addActionListener((event) -> {
-                setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-                this.invalidate();
-            });
-            lookAndFeelMenu.add(systemLookAndFeel);
-        }
-
-        {
-            JMenuItem crossplatformLookAndFeel = new JMenuItem("Универсальная схема", KeyEvent.VK_S);
-            crossplatformLookAndFeel.addActionListener((event) -> {
-                setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
-                this.invalidate();
-            });
-            lookAndFeelMenu.add(crossplatformLookAndFeel);
-        }
-
-        JMenu testMenu = new JMenu("Тесты");
-        testMenu.setMnemonic(KeyEvent.VK_T);
-        testMenu.getAccessibleContext().setAccessibleDescription(
-                "Тестовые команды");
-        
-        {
-            JMenuItem addLogMessageItem = new JMenuItem("Сообщение в лог", KeyEvent.VK_S);
-            addLogMessageItem.addActionListener((event) -> {
-                Logger.debug("Новая строка");
-            });
-            testMenu.add(addLogMessageItem);
-        }
-
-        JMenu actionMenu = new JMenu("Действия");
-        actionMenu.setMnemonic(KeyEvent.VK_A);
-        actionMenu.getAccessibleContext().setAccessibleDescription(
-                "Действия с приложением");
-
-        {
-            JMenuItem exitItem = new JMenuItem("Выход", KeyEvent.VK_E);
-            exitItem.addActionListener((event) -> {
-                dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
-            });
-            actionMenu.add(exitItem);
-        }
-
-        menuBar.add(lookAndFeelMenu);
-        menuBar.add(testMenu);
-        menuBar.add(actionMenu);
-
-        return menuBar;
-    }
-    
-    private void setLookAndFeel(String className)
-    {
-        try
-        {
-            UIManager.setLookAndFeel(className);
-            SwingUtilities.updateComponentTreeUI(this);
-        }
-        catch (ClassNotFoundException | InstantiationException
-            | IllegalAccessException | UnsupportedLookAndFeelException e)
-        {
-            // игнорируется
-        }
     }
 
     /**
@@ -178,11 +102,12 @@ public class MainApplicationFrame extends JFrame
                 if (icon.getInternalFrame() instanceof Savable savable)
                     savable.saveState();
             }
-            try {
-                windowsManager.saveWindowsPreferences();
-            }catch (IOException e){
-                //ignore
-            }
+        }
+
+        try {
+            windowsManager.saveWindowsPreferences();
+        }catch (IOException e){
+            //ignore
         }
     }
 }
