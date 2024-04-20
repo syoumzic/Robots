@@ -33,7 +33,7 @@ public class GameWindow extends JInternalFrame implements Savable
         try{
             loadState();
         }catch(NoSuchElementException e){
-            setLocation(350, 20);
+            setLocation(350, 10);
             setSize(400, 400);
         }
     }

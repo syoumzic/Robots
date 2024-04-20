@@ -41,7 +41,7 @@ public class MainApplicationFrame extends JFrame
         LogWindow logWindow = new LogWindow(windowsManager);
         addWindow(logWindow);
 
-        RobotPositionWindow robotPositionWindow = new RobotPositionWindow();
+        RobotPositionWindow robotPositionWindow = new RobotPositionWindow(windowsManager);
         addWindow(robotPositionWindow);
 
         GameWindow gameWindow = new GameWindow(robotPositionWindow, windowsManager);
