@@ -1,16 +1,23 @@
 package game;
 
+import gui.GameWindow;
+
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.Timer;
 import java.util.TimerTask;
 
+/**
+ * Логика взаимодействия отображения и обновление состояния игры
+ */
 public class GameController {
-    private GameEngine engine;
+    private GameModel model;
     private GameVisualizer visualizer;
     private Timer timer;
 
-    GameController(GameVisualizer visualizer, GameEngine engine) {
+    public GameController(GameWindow gameWindow, GameVisualizer visualizer, GameModel model) {
         this.visualizer = visualizer;
-        this.engine = engine;
+        this.model = model;
 
         timer = new Timer("events generator", true);
         timer.schedule(new TimerTask() {
@@ -22,8 +29,16 @@ public class GameController {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                engine.onModelUpdateEvent();
+                model.onModelUpdateEvent();
             }
         }, 0, 10);
+
+        gameWindow.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                model.setTargetPosition(e.getPoint());
+                visualizer.repaint();
+            }
+        });
     }
 }

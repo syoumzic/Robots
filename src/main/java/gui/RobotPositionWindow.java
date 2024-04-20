@@ -1,4 +1,4 @@
-package game;
+package gui;
 
 import javax.swing.*;
 import java.awt.*;
@@ -26,14 +26,12 @@ public class RobotPositionWindow extends JInternalFrame implements PropertyChang
     /**
      * Метод для обновления координат на окне
      */
-    void updateContent(double x, double y){
+    private void updateContent(double x, double y){
         textArea.setText("Координаты робота:\nx: %f\ny: %f".formatted(x, y));
     }
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        GameEngine engine = (GameEngine) evt.getSource();
-//        textArea.setText("Координаты робота:\nx: %f\ny: %f".formatted(engine.getRobotPositionX(), engine.getRobotPositionY()));
         double[] position = (double[])evt.getNewValue();
         updateContent(position[0], position[1]);
     }

@@ -1,4 +1,8 @@
-package log;
+package gui;
+
+import log.LogChangeListener;
+import log.LogEntry;
+import log.LogWindowSource;
 
 import java.awt.BorderLayout;
 import java.awt.EventQueue;

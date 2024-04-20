@@ -5,9 +5,9 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 
 /**
- * Двиодок для управления роботом
+ * Модель управления роботом
  */
-public class GameEngine {
+public class GameModel {
     private volatile double robotPositionX = 100;
     private volatile double robotPositionY = 100;
     private volatile double robotDirection = 0;
@@ -21,10 +21,10 @@ public class GameEngine {
 
     private final double duration = 10;
 
-    private PropertyChangeSupport broadcast = new PropertyChangeSupport(this);
+    private PropertyChangeSupport support = new PropertyChangeSupport(this);
 
-    GameEngine(PropertyChangeListener gameWindow){
-        broadcast.addPropertyChangeListener(gameWindow);
+    public GameModel(PropertyChangeListener listener){
+        support.addPropertyChangeListener(listener);
         sendPosition(robotPositionX, robotPositionY);
     }
 
@@ -110,7 +110,7 @@ public class GameEngine {
         if (!Double.isFinite(newY)) {
             newY = robotPositionY + velocity * duration * Math.sin(robotDirection);
         }
-        broadcast.firePropertyChange("changePosition", new double[]{robotPositionX, robotPositionY}, new double[]{newX, newY});
+        support.firePropertyChange("changePosition", new double[]{robotPositionX, robotPositionY}, new double[]{newX, newY});
         robotPositionX = newX;
         robotPositionY = newY;
         sendPosition(newX, newY);
@@ -121,7 +121,7 @@ public class GameEngine {
     /**
      * Ограничение значения angle в диапазоне от -pi до pi
      */
-    public double angleNormalize(double angle){
+    private double angleNormalize(double angle){
         if(angle > Math.PI)
             return angle - Math.TAU;
         else if(angle < -Math.PI)
@@ -130,19 +130,15 @@ public class GameEngine {
     }
 
     /**
-     * Округление заданного числа
-     */
-    public int round(double value) {
-        return (int) (value + 0.5);
-    }
-
-    /**
      * Разослать всем подписанным слушателям новые координаты
      */
     private void sendPosition(double x, double y){
-        broadcast.firePropertyChange("changePosition", null, new double[]{x, y});
+        support.firePropertyChange("changePosition", null, new double[]{x, y});
     }
 
+    /**
+     * Установка позиции цели
+     */
     public void setTargetPosition(Point p) {
         targetPositionX = p.x;
         targetPositionY = p.y;

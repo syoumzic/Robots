@@ -3,6 +3,9 @@ package menu;
 import javax.swing.*;
 import java.awt.event.KeyEvent;
 
+/**
+ * Меню настройки темы окна. Содержит различные темы
+ */
 public class LookAndFeelMenu extends JMenu {
     LookAndFeelMenu(JFrame mainFrame){
         super("Режим отображения");

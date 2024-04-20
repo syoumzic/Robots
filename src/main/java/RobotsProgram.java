@@ -1,3 +1,5 @@
+import gui.MainApplicationFrame;
+
 import java.awt.Frame;
 
 import javax.swing.SwingUtilities;
