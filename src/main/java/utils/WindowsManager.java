@@ -15,8 +15,7 @@ import java.util.NoSuchElementException;
  * Сущность для работы с окнами
  */
 public class WindowsManager{
-    private final Data storage = new Data();
-    final String path = System.getProperty("user.home") + "/windowsPreferences.txt";
+    private Data storage = new Data();
 
     /**
      * Сохраняет состояние компонента в хранилище
@@ -35,7 +34,7 @@ public class WindowsManager{
     }
 
     /**
-     * Востанавливает состояние компонента из хранилища
+     * Восстанавливает состояние компонента из хранилища
      *
      * @throws NoSuchElementException в объекте данных нет необходимого поля
      */
@@ -59,26 +58,11 @@ public class WindowsManager{
         }
     }
 
-    /**
-     * Сохраняет в файл состояние внутренних окон
-     */
-    public void saveWindowsPreferences() throws IOException {
-        try(PrintWriter writer = new PrintWriter(new FileWriter(path))){
-            for (Map.Entry<String, String> entry: storage.entrySet()) {
-                String line = entry.getKey() + ":" + entry.getValue();
-                writer.println(line);
-            }
-        }
+    public Data getStorage() {
+        return storage;
     }
 
-    /**
-     * Восстанавливает из файла состяние внутренних окон
-     */
-    public void loadWindowPreferences() throws IOException {
-        for(String line: Files.readAllLines(Paths.get(path))){
-            int pointsIndex = line.indexOf(':');
-            if(pointsIndex == -1) throw new IOException();
-            storage.setString(line.substring(0, pointsIndex), line.substring(pointsIndex+1));
-        }
+    public void setStorage(Data storage) {
+        this.storage = storage;
     }
 }

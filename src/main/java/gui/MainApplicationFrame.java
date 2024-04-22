@@ -1,5 +1,6 @@
 package gui;
 
+import utils.FileManager;
 import utils.Savable;
 import log.Logger;
 import utils.WindowsManager;
@@ -15,6 +16,7 @@ public class MainApplicationFrame extends JFrame
 {
     private final JDesktopPane desktopPane = new JDesktopPane();
     private final WindowsManager windowsManager = new WindowsManager();
+    private final FileManager fileManager = new FileManager();
 
     public MainApplicationFrame() {
         int inset = 50;
@@ -26,7 +28,7 @@ public class MainApplicationFrame extends JFrame
         setContentPane(desktopPane);
 
         try {
-            windowsManager.loadWindowPreferences();
+            windowsManager.setStorage(fileManager.loadWindowPreference());
         }catch(IOException e){
             //ignore
         }
@@ -162,7 +164,7 @@ public class MainApplicationFrame extends JFrame
                     savable.saveState();
             }
             try {
-                windowsManager.saveWindowsPreferences();
+                fileManager.saveWindowPreferences(windowsManager.getStorage());
             }catch (IOException e){
                 //ignore
             }
