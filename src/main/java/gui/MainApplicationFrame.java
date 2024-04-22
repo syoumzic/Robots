@@ -2,6 +2,7 @@ package gui;
 
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import utils.FileManager;
 import utils.Savable;
 import log.Logger;
 import utils.WindowsManager;
@@ -22,6 +23,7 @@ public class MainApplicationFrame extends JFrame
 {
     private final JDesktopPane desktopPane = new JDesktopPane();
     private final WindowsManager windowsManager = new WindowsManager();
+    private final FileManager fileManager = new FileManager();
 
     public MainApplicationFrame() {
         int inset = 50;
@@ -33,7 +35,7 @@ public class MainApplicationFrame extends JFrame
         setContentPane(desktopPane);
 
         try {
-            windowsManager.loadWindowPreferences();
+            windowsManager.setStorage(fileManager.loadWindowPreference());
         }catch(IOException e){
             //ignore
         }
@@ -102,12 +104,11 @@ public class MainApplicationFrame extends JFrame
                 if (icon.getInternalFrame() instanceof Savable savable)
                     savable.saveState();
             }
-        }
-
-        try {
-            windowsManager.saveWindowsPreferences();
-        }catch (IOException e){
-            //ignore
+            try {
+                fileManager.saveWindowPreferences(windowsManager.getStorage());
+            }catch (IOException e){
+                //ignore
+            }
         }
     }
 }

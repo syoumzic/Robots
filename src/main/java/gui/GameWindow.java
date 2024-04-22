@@ -29,6 +29,7 @@ public class GameWindow extends JInternalFrame implements Savable
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(visualizer, BorderLayout.CENTER);
         getContentPane().add(panel);
+        pack();
 
         try{
             loadState();
