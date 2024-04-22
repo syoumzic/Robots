@@ -2,7 +2,7 @@ package utils;
 
 import javax.swing.*;
 import java.awt.*;
-import java.beans.PropertyVetoException;1
+import java.beans.PropertyVetoException;
 import java.util.NoSuchElementException;
 
 /**
