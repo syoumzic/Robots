@@ -11,15 +11,10 @@ import java.awt.TextArea;
 import javax.swing.JInternalFrame;
 import javax.swing.JPanel;
 
-import log.LogChangeListener;
-import log.LogEntry;
-import log.LogWindowSource;
 import log.Logger;
 import utils.Savable;
 import utils.WindowsManager;
 
-import javax.swing.*;
-import java.awt.*;
 import java.util.NoSuchElementException;
 
 public class LogWindow extends JInternalFrame implements LogChangeListener, Savable {

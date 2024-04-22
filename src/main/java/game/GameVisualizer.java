@@ -1,29 +1,25 @@
 package game;
 
-import java.awt.Color;
-import java.awt.EventQueue;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
+import java.awt.*;
 import java.awt.geom.AffineTransform;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 import javax.swing.JPanel;
 
 /**
  * Представление робота
  */
-public class GameVisualizer extends JPanel{
-    private GameModel model;
+public class GameVisualizer extends JPanel implements PropertyChangeListener {
+    private double robotPositionX = 0;
+    private double robotPositionY = 0;
+    private double robotDirection = 0;
 
-    public GameVisualizer(GameModel model) {
-        this.model = model;
+    private double targetPositionX = 0;
+    private double targetPositionY = 0;
+
+    public GameVisualizer() {
         setDoubleBuffered(true);
-    }
-
-    /**
-     * Действие для отрисовки окна
-     */
-    public void onRedrawEvent() {
-        EventQueue.invokeLater(this::repaint);
     }
 
     /**
@@ -33,8 +29,8 @@ public class GameVisualizer extends JPanel{
     public void paint(Graphics g) {
         super.paint(g);
         Graphics2D g2d = (Graphics2D) g;
-        drawRobot(g2d, round(model.getRobotPositionX()), round(model.getRobotPositionY()), model.getRobotDirection());
-        drawTarget(g2d, model.getTargetPositionX(), model.getTargetPositionY());
+        drawRobot(g2d, round(robotPositionX), round(robotPositionY), robotDirection);
+        drawTarget(g2d, round(targetPositionX), round(targetPositionY));
     }
 
     /**
@@ -62,18 +58,16 @@ public class GameVisualizer extends JPanel{
      * Отрисовка робота
      */
     private void drawRobot(Graphics2D g, int x, int y, double direction) {
-        int robotCenterX = round(model.getRobotPositionX());
-        int robotCenterY = round(model.getRobotPositionY());
-        AffineTransform t = AffineTransform.getRotateInstance(direction, robotCenterX, robotCenterY);
+        AffineTransform t = AffineTransform.getRotateInstance(direction, x, y);
         g.setTransform(t);
         g.setColor(Color.MAGENTA);
-        fillOval(g, robotCenterX, robotCenterY, 30, 10);
+        fillOval(g, x, y, 30, 10);
         g.setColor(Color.BLACK);
-        drawOval(g, robotCenterX, robotCenterY, 30, 10);
+        drawOval(g, x, y, 30, 10);
         g.setColor(Color.WHITE);
-        fillOval(g, robotCenterX + 10, robotCenterY, 5, 5);
+        fillOval(g, x + 10, y, 5, 5);
         g.setColor(Color.BLACK);
-        drawOval(g, robotCenterX + 10, robotCenterY, 5, 5);
+        drawOval(g, x + 10, y, 5, 5);
     }
 
     /**
@@ -86,5 +80,19 @@ public class GameVisualizer extends JPanel{
         fillOval(g, x, y, 5, 5);
         g.setColor(Color.BLACK);
         drawOval(g, x, y, 5, 5);
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        if("modelChange".equals(evt.getPropertyName())) {
+           GameModel model = (GameModel)evt.getSource();
+           robotPositionX = model.getRobotPositionX();
+           robotPositionY = model.getRobotPositionY();
+           robotDirection = model.getRobotDirection();
+
+           targetPositionX = model.getTargetPositionX();
+           targetPositionY = model.getTargetPositionY();
+           repaint();
+        }
     }
 }

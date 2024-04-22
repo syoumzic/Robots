@@ -1,5 +1,6 @@
 package gui;
 
+import game.GameModel;
 import utils.Savable;
 import utils.WindowsManager;
 
@@ -7,7 +8,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.IOException;
 import java.util.NoSuchElementException;
 
 /**
@@ -16,6 +16,7 @@ import java.util.NoSuchElementException;
 public class RobotPositionWindow extends JInternalFrame implements PropertyChangeListener, Savable {
     private TextArea textArea;
     private WindowsManager windowsManager;
+
     public RobotPositionWindow(WindowsManager windowsManager) {
         super("Позиция робота", true, true, true, true);
         this.windowsManager = windowsManager;
@@ -40,14 +41,16 @@ public class RobotPositionWindow extends JInternalFrame implements PropertyChang
     /**
      * Метод для обновления координат на окне
      */
-    private void updateContent(double x, double y){
+    private void updatePosition(double x, double y){
         textArea.setText("Координаты робота:\nx: %f\ny: %f".formatted(x, y));
     }
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        double[] position = (double[])evt.getNewValue();
-        updateContent(position[0], position[1]);
+        if("modelChange".equals(evt.getPropertyName())) {
+            GameModel model = (GameModel)evt.getSource();
+            updatePosition(model.getRobotPositionX(), model.getRobotPositionY());
+        }
     }
 
     @Override

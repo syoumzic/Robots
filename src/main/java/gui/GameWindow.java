@@ -10,21 +10,24 @@ import utils.Savable;
 import utils.WindowsManager;
 
 import javax.swing.*;
-import java.awt.*;
 import java.util.NoSuchElementException;
 
 public class GameWindow extends JInternalFrame implements Savable
 {
     private WindowsManager windowsManager;
 
-    public GameWindow(PropertyChangeListener listener, WindowsManager windowsManager)
+    public GameWindow(PropertyChangeListener positionListener, WindowsManager windowsManager)
     {
         super("Игровое поле", true, true, true, true);
         this.windowsManager = windowsManager;
 
-        GameModel model = new GameModel(listener);
-        GameVisualizer visualizer = new GameVisualizer(model);
-        GameController controller = new GameController(this, visualizer, model);
+        GameVisualizer visualizer = new GameVisualizer();
+
+        GameModel model = new GameModel();
+        model.addPropertyChangeListener(positionListener);
+        model.addPropertyChangeListener(visualizer);
+
+        GameController controller = new GameController(this, model);
 
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(visualizer, BorderLayout.CENTER);

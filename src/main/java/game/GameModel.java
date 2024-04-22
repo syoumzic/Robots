@@ -8,7 +8,7 @@ import java.beans.PropertyChangeSupport;
  * Модель управления роботом
  */
 public class GameModel {
-    private volatile double robotPositionX = 100;
+    private volatile double robotPositionX = 0;
     private volatile double robotPositionY = 100;
     private volatile double robotDirection = 0;
 
@@ -17,15 +17,17 @@ public class GameModel {
 
     private final double maxVelocity = 0.1;
     private final double maxAngularVelocity = 0.001;
-    private final double minTargetDistance = 0.5;
+    private final double minTargetDistance = 0.1;
 
-    private final double duration = 10;
+    private final double duration = 50;
 
     private PropertyChangeSupport support = new PropertyChangeSupport(this);
 
-    public GameModel(PropertyChangeListener listener){
+    /**
+     * Добавляет слушателя
+     */
+    public void addPropertyChangeListener(PropertyChangeListener listener){
         support.addPropertyChangeListener(listener);
-        sendPosition(robotPositionX, robotPositionY);
     }
 
     /**
@@ -52,7 +54,7 @@ public class GameModel {
      */
     public void onModelUpdateEvent() {
         double distance = distance(targetPositionX, targetPositionY, robotPositionX, robotPositionY);
-        if (distance < minTargetDistance) {
+        if (distance < minTargetDistance * duration) {
             return;
         }
         double velocity = maxVelocity;
@@ -62,8 +64,6 @@ public class GameModel {
         double dist1 = robotDirection - angleToTarget + Math.TAU;
         double dist2 = Math.abs(robotDirection - angleToTarget);
         double dist3 = -robotDirection + angleToTarget + Math.TAU;
-
-        double minDist = Math.min(dist1, Math.min(dist2, dist3));
 
         if(dist1 < dist2 && dist1 < dist3){
             angularVelocity = -maxAngularVelocity;
@@ -110,10 +110,10 @@ public class GameModel {
         if (!Double.isFinite(newY)) {
             newY = robotPositionY + velocity * duration * Math.sin(robotDirection);
         }
-        support.firePropertyChange("changePosition", new double[]{robotPositionX, robotPositionY}, new double[]{newX, newY});
         robotPositionX = newX;
         robotPositionY = newY;
-        sendPosition(newX, newY);
+        notifyChange();
+
         double newDirection = angleNormalize(robotDirection + angularVelocity * duration);
         robotDirection = newDirection;
     }
@@ -130,10 +130,10 @@ public class GameModel {
     }
 
     /**
-     * Разослать всем подписанным слушателям новые координаты
+     * Оповестить слушателей об изменении объекта
      */
-    private void sendPosition(double x, double y){
-        support.firePropertyChange("changePosition", null, new double[]{x, y});
+    public void notifyChange(){
+        support.firePropertyChange("modelChange", null, null);
     }
 
     /**
@@ -142,6 +142,7 @@ public class GameModel {
     public void setTargetPosition(Point p) {
         targetPositionX = p.x;
         targetPositionY = p.y;
+        notifyChange();
     }
 
     public double getRobotPositionX() {

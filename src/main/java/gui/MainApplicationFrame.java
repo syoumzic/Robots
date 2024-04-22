@@ -4,19 +4,14 @@ import java.awt.Dimension;
 import java.awt.Toolkit;
 import utils.FileManager;
 import utils.Savable;
-import log.Logger;
 import utils.WindowsManager;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
-import javax.swing.*;
-
 import menu.CustomMenuBar;
-import log.Logger;
 import java.io.IOException;
 
 public class MainApplicationFrame extends JFrame
