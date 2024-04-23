@@ -34,7 +34,7 @@ public class FileManager {
         for (String line : Files.readAllLines(Paths.get(path))) {
             int pointsIndex = line.indexOf(':');
             if (pointsIndex == -1)
-                throw new IOException();
+                throw new IOException("ошибка чтения файла (ошибка чтения строки %s)".formatted(line));
             storage.setString(line.substring(0, pointsIndex), line.substring(pointsIndex + 1));
         }
 

@@ -30,12 +30,8 @@ public class RobotPositionWindow extends JInternalFrame implements PropertyChang
         getContentPane().add(textArea);
         pack();
 
-        try{
-            loadState();
-        }catch (NoSuchElementException e){
-            setLocation(790, 10);
-            setSize(200, 200);
-        }
+        setLocation(790, 10);
+        setSize(200, 200);
     }
 
     /**
@@ -54,12 +50,7 @@ public class RobotPositionWindow extends JInternalFrame implements PropertyChang
     }
 
     @Override
-    public void saveState() {
-        windowsManager.setWindow("robotPositionWindow", this);
-    }
-
-    @Override
-    public void loadState() throws NoSuchElementException {
-        windowsManager.loadWindow("robotPositionWindow", this);
+    public String getWindowName() {
+        return "robotPositionWindow";
     }
 }

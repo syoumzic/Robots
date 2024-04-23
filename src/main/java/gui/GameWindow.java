@@ -14,12 +14,10 @@ import java.util.NoSuchElementException;
 
 public class GameWindow extends JInternalFrame implements Savable
 {
-    private WindowsManager windowsManager;
 
-    public GameWindow(PropertyChangeListener positionListener, WindowsManager windowsManager)
+    public GameWindow(PropertyChangeListener positionListener)
     {
         super("Игровое поле", true, true, true, true);
-        this.windowsManager = windowsManager;
 
         GameVisualizer visualizer = new GameVisualizer();
 
@@ -34,21 +32,12 @@ public class GameWindow extends JInternalFrame implements Savable
         getContentPane().add(panel);
         pack();
 
-        try{
-            loadState();
-        }catch(NoSuchElementException e){
-            setLocation(350, 10);
-            setSize(400, 400);
-        }
+        setLocation(350, 20);
+        setSize(400, 400);
     }
 
     @Override
-    public void saveState() {
-        windowsManager.setWindow("gameWindow", this);
-    }
-
-    @Override
-    public void loadState() throws NoSuchElementException {
-        windowsManager.loadWindow("gameWindow", this);
+    public String getWindowName() {
+        return "gameWindow";
     }
 }

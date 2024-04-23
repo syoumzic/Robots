@@ -20,11 +20,9 @@ import java.util.NoSuchElementException;
 public class LogWindow extends JInternalFrame implements LogChangeListener, Savable {
     private LogWindowSource m_logSource;
     private TextArea m_logContent;
-    private WindowsManager windowsManager;
 
-    public LogWindow(WindowsManager windowsManager) {
+    public LogWindow() {
         super("Протокол работы", true, true, true, true);
-        this.windowsManager = windowsManager;
 
         pack();
         Logger.debug("Протокол работает");
@@ -40,12 +38,8 @@ public class LogWindow extends JInternalFrame implements LogChangeListener, Sava
         pack();
         updateLogContent();
 
-        try {
-            loadState();
-        } catch (NoSuchElementException e) {
-            setLocation(10, 10);
-            setSize(300, 800);
-        }
+        setLocation(10, 10);
+        setSize(300, 800);
     }
 
     private void updateLogContent() {
@@ -63,12 +57,7 @@ public class LogWindow extends JInternalFrame implements LogChangeListener, Sava
     }
 
     @Override
-    public void saveState() {
-        windowsManager.setWindow("logWindow", this);
-    }
-
-    @Override
-    public void loadState() throws NoSuchElementException{
-        windowsManager.loadWindow("logWindow", this);
+    public String getWindowName() {
+        return "logWindow";
     }
 }
