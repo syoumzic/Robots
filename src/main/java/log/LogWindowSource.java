@@ -4,6 +4,8 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Структура данных для хранения логов
@@ -11,6 +13,7 @@ import java.util.Collections;
 public class LogWindowSource{
     private final PropertyChangeSupport support = new PropertyChangeSupport(this);
     private final CircleQueue<LogEntry> messages;
+    private final Lock lock = new ReentrantLock();
     
     public LogWindowSource(int iQueueLength){
         messages = new CircleQueue<>(iQueueLength);
@@ -20,8 +23,11 @@ public class LogWindowSource{
      * Добавляет слушателя
      */
     public void addPropertyChangeListener(PropertyChangeListener listener){
-        synchronized(support){
+        lock.lock();
+        try{
             support.addPropertyChangeListener(listener);
+        }finally {
+            lock.unlock();
         }
     }
 
@@ -29,8 +35,11 @@ public class LogWindowSource{
      * Удаляет слушателя
      */
     public void removePropertyChangeListener(PropertyChangeListener listener){
-        synchronized(support){
+        lock.lock();
+        try{
             support.removePropertyChangeListener(listener);
+        }finally {
+            lock.unlock();
         }
     }
 
@@ -38,10 +47,13 @@ public class LogWindowSource{
      * Добавляет сообщение в лог
      */
     public void append(LogLevel logLevel, String strMessage){
-        synchronized (messages) {
+        lock.lock();
+        try{
             LogEntry entry = new LogEntry(logLevel, strMessage);
             messages.append(entry);
             support.firePropertyChange("logChange", null, null);
+        }finally {
+            lock.unlock();
         }
     }
 
@@ -49,8 +61,11 @@ public class LogWindowSource{
      * Возвращает итерируемый объект логов в промежутке от leftIndex до rightIndex, не включая rightIndex
      */
     public Iterable<LogEntry> range(int leftIndex, int rightIndex){
-        synchronized (messages) {
+        lock.lock();
+        try{
             return messages.range(leftIndex, rightIndex);
+        }finally {
+            lock.unlock();
         }
     }
 
@@ -58,8 +73,11 @@ public class LogWindowSource{
      * Возвращает итерируемый объект всех логов
      */
     public Iterable<LogEntry> all(){
-        synchronized (messages) {
+        lock.lock();
+        try{
             return messages.all();
+        }finally {
+            lock.unlock();
         }
     }
 }
