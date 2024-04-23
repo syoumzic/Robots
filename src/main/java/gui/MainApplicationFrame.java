@@ -30,10 +30,11 @@ public class MainApplicationFrame extends JFrame
         try {
             windowsManager.setStorage(fileManager.loadWindowPreference());
         }catch(IOException e){
-            //ignore
+            Logger.error(e.toString());
         }
-        addWindow(new LogWindow(windowsManager));
-        addWindow(new GameWindow(windowsManager));
+        addWindow(new LogWindow());
+        addWindow(new GameWindow());
+        loadWindowStates();
 
         setJMenuBar(generateMenuBar());
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -125,7 +126,7 @@ public class MainApplicationFrame extends JFrame
         catch (ClassNotFoundException | InstantiationException
             | IllegalAccessException | UnsupportedLookAndFeelException e)
         {
-            // игнорируется
+            Logger.error("Не удалось установить тему");
         }
     }
 
@@ -157,16 +158,31 @@ public class MainApplicationFrame extends JFrame
     public void saveState() {
         for (Component component : desktopPane.getComponents()) {
             if (component instanceof Savable savable) {
-                savable.saveState();
+                windowsManager.loadWindow(savable.getWindowName(), this);
             }
             else if (component instanceof JInternalFrame.JDesktopIcon icon) {
                 if (icon.getInternalFrame() instanceof Savable savable)
-                    savable.saveState();
+                    windowsManager.loadWindow(savable.getWindowName(), this);
             }
             try {
                 fileManager.saveWindowPreferences(windowsManager.getStorage());
             }catch (IOException e){
-                //ignore
+                Logger.error(e.toString());
+            }
+        }
+    }
+
+    /**
+     * Восстанавливает состояние всех внутренних окон
+     */
+    public void loadWindowStates(){
+        for (Component component : desktopPane.getComponents()) {
+            if (component instanceof Savable savable) {
+                windowsManager.setWindow(savable.getWindowName(), component);
+            }
+            else if (component instanceof JInternalFrame.JDesktopIcon icon) {
+                if (icon.getInternalFrame() instanceof Savable savable)
+                    windowsManager.setWindow(savable.getWindowName(), component);
             }
         }
     }
