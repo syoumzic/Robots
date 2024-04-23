@@ -11,12 +11,7 @@ import javax.swing.JPanel;
  * Представление робота
  */
 public class GameVisualizer extends JPanel implements PropertyChangeListener {
-    private double robotPositionX = 0;
-    private double robotPositionY = 0;
-    private double robotDirection = 0;
-
-    private double targetPositionX = 0;
-    private double targetPositionY = 0;
+    private GameModel model;
 
     public GameVisualizer() {
         setDoubleBuffered(true);
@@ -29,8 +24,8 @@ public class GameVisualizer extends JPanel implements PropertyChangeListener {
     public void paint(Graphics g) {
         super.paint(g);
         Graphics2D g2d = (Graphics2D) g;
-        drawRobot(g2d, round(robotPositionX), round(robotPositionY), robotDirection);
-        drawTarget(g2d, round(targetPositionX), round(targetPositionY));
+        drawRobot(g2d, round(model.getRobotPositionX()), round(model.getRobotPositionY()), model.getRobotDirection());
+        drawTarget(g2d, round(model.getTargetPositionX()), round(model.getTargetPositionY()));
     }
 
     /**
@@ -85,13 +80,7 @@ public class GameVisualizer extends JPanel implements PropertyChangeListener {
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         if("modelChange".equals(evt.getPropertyName())) {
-           GameModel model = (GameModel)evt.getSource();
-           robotPositionX = model.getRobotPositionX();
-           robotPositionY = model.getRobotPositionY();
-           robotDirection = model.getRobotDirection();
-
-           targetPositionX = model.getTargetPositionX();
-           targetPositionY = model.getTargetPositionY();
+           model = (GameModel)evt.getSource();
            repaint();
         }
     }

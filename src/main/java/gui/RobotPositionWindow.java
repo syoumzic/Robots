@@ -15,11 +15,9 @@ import java.util.NoSuchElementException;
  */
 public class RobotPositionWindow extends JInternalFrame implements PropertyChangeListener, Savable {
     private TextArea textArea;
-    private WindowsManager windowsManager;
 
-    public RobotPositionWindow(WindowsManager windowsManager) {
+    public RobotPositionWindow() {
         super("Позиция робота", true, true, true, true);
-        this.windowsManager = windowsManager;
 
         textArea = new TextArea();
 
