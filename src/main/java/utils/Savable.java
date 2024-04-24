@@ -6,7 +6,7 @@ package utils;
 public interface Savable {
 
     /**
-     * Сохраняет своё состояние
+     * Возвращает имя сохраняемого окна
      */
     String getWindowName();
 }
