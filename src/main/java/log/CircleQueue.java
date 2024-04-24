@@ -37,12 +37,7 @@ public class CircleQueue<Type>{
      * Возвращение всех итерируемого объекта всех элементов очереди
      */
     public Iterable<Type> all(){
-        List<Type> list = new ArrayList<>(length);
-        for(int i = 0; i < length; i++){
-            int shiftIndex = (shift + i) % capacity;
-            list.add(storage[shiftIndex]);
-        }
-        return list;
+        return new CircelQueueIterable<>(this, 0, length);
     }
 
     /**
@@ -52,12 +47,7 @@ public class CircleQueue<Type>{
         if(leftIndex > rightIndex || leftIndex < 0 || rightIndex > length)
             throw new ArrayIndexOutOfBoundsException();
 
-        List<Type> list = new ArrayList<>(rightIndex - leftIndex);
-        for(int i = leftIndex; i < rightIndex; i++){
-            int shiftIndex = (shift + i) % capacity;
-            list.add(storage[shiftIndex]);
-        }
-        return list;
+        return new CircelQueueIterable<>(this, leftIndex, rightIndex);
     }
 
     /**
@@ -67,5 +57,12 @@ public class CircleQueue<Type>{
         if(index < 0 || index >= length)
             throw new ArrayIndexOutOfBoundsException();
         return this.storage[(shift + index) % capacity];
+    }
+
+    /**
+     * Возвращает размер хранимой в структуре данных
+     */
+    public int size(){
+        return length;
     }
 }

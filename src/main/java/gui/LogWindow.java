@@ -50,7 +50,7 @@ public class LogWindow extends JInternalFrame implements PropertyChangeListener,
 
     private void updateLogContent() {
         StringBuilder content = new StringBuilder();
-        for (LogEntry entry : m_logSource.all()) {
+        for (LogEntry entry : m_logSource.range(0, m_logSource.size())) {
             content.append(entry.getMessage()).append("\n");
         }
         m_logContent.setText(content.toString());

@@ -80,4 +80,11 @@ public class LogWindowSource{
             lock.unlock();
         }
     }
+
+    /**
+     * Возвращает размер хранимых логов
+     */
+    public int size(){
+        return messages.size();
+    }
 }
