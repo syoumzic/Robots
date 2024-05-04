@@ -1,6 +1,5 @@
 package gui;
 
-import log.LogChangeListener;
 import log.LogEntry;
 import log.LogWindowSource;
 
@@ -15,9 +14,11 @@ import log.Logger;
 import utils.Savable;
 import utils.WindowsManager;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.NoSuchElementException;
 
-public class LogWindow extends JInternalFrame implements LogChangeListener, Savable {
+public class LogWindow extends JInternalFrame implements PropertyChangeListener, Savable {
     private LogWindowSource m_logSource;
     private TextArea m_logContent;
 
@@ -28,7 +29,7 @@ public class LogWindow extends JInternalFrame implements LogChangeListener, Sava
         Logger.debug("Протокол работает");
 
         m_logSource = Logger.getDefaultLogSource();
-        m_logSource.registerListener(this);
+        m_logSource.addPropertyChangeListener(this);
         m_logContent = new TextArea("");
         m_logContent.setSize(200, 500);
 
@@ -52,12 +53,12 @@ public class LogWindow extends JInternalFrame implements LogChangeListener, Sava
     }
 
     @Override
-    public void onLogChanged() {
-        EventQueue.invokeLater(this::updateLogContent);
+    public String getWindowName() {
+        return "logWindow";
     }
 
     @Override
-    public String getWindowName() {
-        return "logWindow";
+    public void propertyChange(PropertyChangeEvent evt) {
+        EventQueue.invokeLater(this::updateLogContent);
     }
 }
