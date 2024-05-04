@@ -1,35 +1,40 @@
 package gui;
 
-import java.awt.Dimension;
-import java.awt.Toolkit;
+import utils.FileManager;
+import utils.Savable;
+import log.Logger;
+import utils.WindowsManager;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-
-import javax.swing.*;
-
-import log.Logger;
+import java.io.IOException;
 
 public class MainApplicationFrame extends JFrame
 {
     private final JDesktopPane desktopPane = new JDesktopPane();
-    
+    private final WindowsManager windowsManager = new WindowsManager();
+    private final FileManager fileManager = new FileManager();
+
     public MainApplicationFrame() {
-        int inset = 50;        
+        int inset = 50;
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         setBounds(inset, inset,
             screenSize.width  - inset*2,
             screenSize.height - inset*2);
 
         setContentPane(desktopPane);
-        
-        
-        LogWindow logWindow = createLogWindow();
-        addWindow(logWindow);
 
-        GameWindow gameWindow = new GameWindow();
-        gameWindow.setSize(400,  400);
-        addWindow(gameWindow);
+        try {
+            windowsManager.setStorage(fileManager.loadWindowPreference());
+        }catch(IOException e){
+            Logger.error(e.toString());
+        }
+        addWindow(new LogWindow());
+        addWindow(new GameWindow());
+        loadWindowStates();
 
         setJMenuBar(generateMenuBar());
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -39,17 +44,10 @@ public class MainApplicationFrame extends JFrame
                 confirmExit();
             }
         });
-    }
-    
-    protected LogWindow createLogWindow()
-    {
-        LogWindow logWindow = new LogWindow(Logger.getDefaultLogSource());
-        logWindow.setLocation(10,10);
-        logWindow.setSize(300, 800);
-        setMinimumSize(logWindow.getSize());
-        logWindow.pack();
-        Logger.debug("Протокол работает");
-        return logWindow;
+
+        pack();
+        setVisible(true);
+        setExtendedState(Frame.MAXIMIZED_BOTH);
     }
     
     protected void addWindow(JInternalFrame frame)
@@ -128,7 +126,7 @@ public class MainApplicationFrame extends JFrame
         catch (ClassNotFoundException | InstantiationException
             | IllegalAccessException | UnsupportedLookAndFeelException e)
         {
-            // игнорируется
+            Logger.error("Не удалось установить тему");
         }
     }
 
@@ -148,8 +146,44 @@ public class MainApplicationFrame extends JFrame
                 null);
 
         if (option == JOptionPane.YES_OPTION) {
+            saveState();
             setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             dispose();
+        }
+    }
+
+    /**
+     * Сохраняет состояние всех внутренних окон
+     */
+    public void saveState() {
+        for (Component component : desktopPane.getComponents()) {
+            if (component instanceof Savable savable) {
+                windowsManager.loadWindow(savable.getWindowName(), this);
+            }
+            else if (component instanceof JInternalFrame.JDesktopIcon icon) {
+                if (icon.getInternalFrame() instanceof Savable savable)
+                    windowsManager.loadWindow(savable.getWindowName(), this);
+            }
+            try {
+                fileManager.saveWindowPreferences(windowsManager.getStorage());
+            }catch (IOException e){
+                Logger.error(e.toString());
+            }
+        }
+    }
+
+    /**
+     * Восстанавливает состояние всех внутренних окон
+     */
+    public void loadWindowStates(){
+        for (Component component : desktopPane.getComponents()) {
+            if (component instanceof Savable savable) {
+                windowsManager.setWindow(savable.getWindowName(), component);
+            }
+            else if (component instanceof JInternalFrame.JDesktopIcon icon) {
+                if (icon.getInternalFrame() instanceof Savable savable)
+                    windowsManager.setWindow(savable.getWindowName(), component);
+            }
         }
     }
 }

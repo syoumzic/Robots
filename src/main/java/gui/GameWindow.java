@@ -1,20 +1,30 @@
 package gui;
 
-import java.awt.BorderLayout;
+import utils.Savable;
+import utils.WindowsManager;
 
-import javax.swing.JInternalFrame;
-import javax.swing.JPanel;
+import javax.swing.*;
+import java.awt.*;
+import java.util.NoSuchElementException;
 
-public class GameWindow extends JInternalFrame
+public class GameWindow extends JInternalFrame implements Savable
 {
     private final GameVisualizer m_visualizer;
-    public GameWindow() 
-    {
+
+    public GameWindow(){
         super("Игровое поле", true, true, true, true);
+
         m_visualizer = new GameVisualizer();
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(m_visualizer, BorderLayout.CENTER);
         getContentPane().add(panel);
-        pack();
+
+        setLocation(350, 20);
+        setSize(400, 400);
+    }
+
+    @Override
+    public String getWindowName() {
+        return "gameWindow";
     }
 }
