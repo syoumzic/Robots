@@ -61,7 +61,7 @@ public class Data{
     }
 
     /**
-     * Загразить переменную типа Data по имени
+     * Загрузить переменную типа Data по имени
      */
     public Data getData(String name) throws NoSuchElementException {
         String rawData = storage.get(name);
@@ -99,7 +99,7 @@ public class Data{
     }
 
     /**
-     * Загразить переменную типа String по имени
+     * Загрузить переменную типа String по имени
      */
     public String getString(String name) {
         return storage.get(name);

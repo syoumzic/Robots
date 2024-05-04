@@ -21,7 +21,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>gui.RobotsProgram</mainClass>
+                            <mainClass>RobotsProgram</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

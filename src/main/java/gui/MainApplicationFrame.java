@@ -1,16 +1,21 @@
 package gui;
 
+import java.awt.Dimension;
+import java.awt.Toolkit;
+
+import log.Logger;
 import utils.FileManager;
 import utils.Savable;
-import log.Logger;
 import utils.WindowsManager;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+
+import menu.CustomMenuBar;
 import java.io.IOException;
+import java.util.NoSuchElementException;
 
 public class MainApplicationFrame extends JFrame
 {
@@ -32,11 +37,19 @@ public class MainApplicationFrame extends JFrame
         }catch(IOException e){
             Logger.error(e.toString());
         }
-        addWindow(new LogWindow());
-        addWindow(new GameWindow());
+
+        LogWindow logWindow = new LogWindow();
+        addWindow(logWindow);
+
+        RobotPositionWindow robotPositionWindow = new RobotPositionWindow();
+        addWindow(robotPositionWindow);
+
+        GameWindow gameWindow = new GameWindow(robotPositionWindow);
+        addWindow(gameWindow);
         loadWindowStates();
 
-        setJMenuBar(generateMenuBar());
+
+        setJMenuBar(new CustomMenuBar(this));
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
             @Override
@@ -54,80 +67,6 @@ public class MainApplicationFrame extends JFrame
     {
         desktopPane.add(frame);
         frame.setVisible(true);
-    }
-    
-    private JMenuBar generateMenuBar()
-    {
-        JMenuBar menuBar = new JMenuBar();
-        
-        JMenu lookAndFeelMenu = new JMenu("Режим отображения");
-        lookAndFeelMenu.setMnemonic(KeyEvent.VK_V);
-        lookAndFeelMenu.getAccessibleContext().setAccessibleDescription(
-                "Управление режимом отображения приложения");
-        
-        {
-            JMenuItem systemLookAndFeel = new JMenuItem("Системная схема", KeyEvent.VK_S);
-            systemLookAndFeel.addActionListener((event) -> {
-                setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-                this.invalidate();
-            });
-            lookAndFeelMenu.add(systemLookAndFeel);
-        }
-
-        {
-            JMenuItem crossplatformLookAndFeel = new JMenuItem("Универсальная схема", KeyEvent.VK_S);
-            crossplatformLookAndFeel.addActionListener((event) -> {
-                setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
-                this.invalidate();
-            });
-            lookAndFeelMenu.add(crossplatformLookAndFeel);
-        }
-
-        JMenu testMenu = new JMenu("Тесты");
-        testMenu.setMnemonic(KeyEvent.VK_T);
-        testMenu.getAccessibleContext().setAccessibleDescription(
-                "Тестовые команды");
-        
-        {
-            JMenuItem addLogMessageItem = new JMenuItem("Сообщение в лог", KeyEvent.VK_S);
-            addLogMessageItem.addActionListener((event) -> {
-                Logger.debug("Новая строка");
-            });
-            testMenu.add(addLogMessageItem);
-        }
-
-        JMenu actionMenu = new JMenu("Действия");
-        actionMenu.setMnemonic(KeyEvent.VK_A);
-        actionMenu.getAccessibleContext().setAccessibleDescription(
-                "Действия с приложением");
-
-        {
-            JMenuItem exitItem = new JMenuItem("Выход", KeyEvent.VK_E);
-            exitItem.addActionListener((event) -> {
-                dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
-            });
-            actionMenu.add(exitItem);
-        }
-
-        menuBar.add(lookAndFeelMenu);
-        menuBar.add(testMenu);
-        menuBar.add(actionMenu);
-
-        return menuBar;
-    }
-    
-    private void setLookAndFeel(String className)
-    {
-        try
-        {
-            UIManager.setLookAndFeel(className);
-            SwingUtilities.updateComponentTreeUI(this);
-        }
-        catch (ClassNotFoundException | InstantiationException
-            | IllegalAccessException | UnsupportedLookAndFeelException e)
-        {
-            Logger.error("Не удалось установить тему");
-        }
     }
 
     /**
@@ -158,11 +97,11 @@ public class MainApplicationFrame extends JFrame
     public void saveState() {
         for (Component component : desktopPane.getComponents()) {
             if (component instanceof Savable savable) {
-                windowsManager.loadWindow(savable.getWindowName(), this);
+                windowsManager.setWindow(savable.getWindowName(), component);
             }
             else if (component instanceof JInternalFrame.JDesktopIcon icon) {
                 if (icon.getInternalFrame() instanceof Savable savable)
-                    windowsManager.loadWindow(savable.getWindowName(), this);
+                    windowsManager.setWindow(savable.getWindowName(), component);
             }
             try {
                 fileManager.saveWindowPreferences(windowsManager.getStorage());
@@ -176,14 +115,17 @@ public class MainApplicationFrame extends JFrame
      * Восстанавливает состояние всех внутренних окон
      */
     public void loadWindowStates(){
-        for (Component component : desktopPane.getComponents()) {
-            if (component instanceof Savable savable) {
-                windowsManager.setWindow(savable.getWindowName(), component);
+        try {
+            for (Component component : desktopPane.getComponents()) {
+                if (component instanceof Savable savable) {
+                    windowsManager.loadWindow(savable.getWindowName(), component);
+                } else if (component instanceof JInternalFrame.JDesktopIcon icon) {
+                    if (icon.getInternalFrame() instanceof Savable savable)
+                        windowsManager.loadWindow(savable.getWindowName(), component);
+                }
             }
-            else if (component instanceof JInternalFrame.JDesktopIcon icon) {
-                if (icon.getInternalFrame() instanceof Savable savable)
-                    windowsManager.setWindow(savable.getWindowName(), component);
-            }
+        }catch (NoSuchElementException e){
+            Logger.error("не удалось загрузить окна");
         }
     }
 }
