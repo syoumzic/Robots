@@ -2,6 +2,8 @@ package gui;
 
 import java.awt.Dimension;
 import java.awt.Toolkit;
+
+import log.Logger;
 import utils.FileManager;
 import utils.Savable;
 import utils.WindowsManager;
@@ -13,6 +15,7 @@ import java.awt.event.WindowEvent;
 
 import menu.CustomMenuBar;
 import java.io.IOException;
+import java.util.NoSuchElementException;
 
 public class MainApplicationFrame extends JFrame
 {
@@ -32,17 +35,18 @@ public class MainApplicationFrame extends JFrame
         try {
             windowsManager.setStorage(fileManager.loadWindowPreference());
         }catch(IOException e){
-            //ignore
+            Logger.error(e.toString());
         }
 
-        LogWindow logWindow = new LogWindow(windowsManager);
+        LogWindow logWindow = new LogWindow();
         addWindow(logWindow);
 
-        RobotPositionWindow robotPositionWindow = new RobotPositionWindow(windowsManager);
+        RobotPositionWindow robotPositionWindow = new RobotPositionWindow();
         addWindow(robotPositionWindow);
 
-        GameWindow gameWindow = new GameWindow(robotPositionWindow, windowsManager);
+        GameWindow gameWindow = new GameWindow(robotPositionWindow);
         addWindow(gameWindow);
+        loadWindowStates();
 
 
         setJMenuBar(new CustomMenuBar(this));
@@ -93,17 +97,35 @@ public class MainApplicationFrame extends JFrame
     public void saveState() {
         for (Component component : desktopPane.getComponents()) {
             if (component instanceof Savable savable) {
-                savable.saveState();
+                windowsManager.setWindow(savable.getWindowName(), component);
             }
             else if (component instanceof JInternalFrame.JDesktopIcon icon) {
                 if (icon.getInternalFrame() instanceof Savable savable)
-                    savable.saveState();
+                    windowsManager.setWindow(savable.getWindowName(), component);
             }
             try {
                 fileManager.saveWindowPreferences(windowsManager.getStorage());
             }catch (IOException e){
-                //ignore
+                Logger.error(e.toString());
             }
+        }
+    }
+
+    /**
+     * Восстанавливает состояние всех внутренних окон
+     */
+    public void loadWindowStates(){
+        try {
+            for (Component component : desktopPane.getComponents()) {
+                if (component instanceof Savable savable) {
+                    windowsManager.loadWindow(savable.getWindowName(), component);
+                } else if (component instanceof JInternalFrame.JDesktopIcon icon) {
+                    if (icon.getInternalFrame() instanceof Savable savable)
+                        windowsManager.loadWindow(savable.getWindowName(), component);
+                }
+            }
+        }catch (NoSuchElementException e){
+            Logger.error("не удалось загрузить окна");
         }
     }
 }

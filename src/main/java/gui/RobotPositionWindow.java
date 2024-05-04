@@ -15,11 +15,9 @@ import java.util.NoSuchElementException;
  */
 public class RobotPositionWindow extends JInternalFrame implements PropertyChangeListener, Savable {
     private TextArea textArea;
-    private WindowsManager windowsManager;
 
-    public RobotPositionWindow(WindowsManager windowsManager) {
+    public RobotPositionWindow() {
         super("Позиция робота", true, true, true, true);
-        this.windowsManager = windowsManager;
 
         textArea = new TextArea();
 
@@ -30,12 +28,8 @@ public class RobotPositionWindow extends JInternalFrame implements PropertyChang
         getContentPane().add(textArea);
         pack();
 
-        try{
-            loadState();
-        }catch (NoSuchElementException e){
-            setLocation(790, 10);
-            setSize(200, 200);
-        }
+        setLocation(790, 10);
+        setSize(200, 200);
     }
 
     /**
@@ -54,12 +48,7 @@ public class RobotPositionWindow extends JInternalFrame implements PropertyChang
     }
 
     @Override
-    public void saveState() {
-        windowsManager.setWindow("robotPositionWindow", this);
-    }
-
-    @Override
-    public void loadState() throws NoSuchElementException {
-        windowsManager.loadWindow("robotPositionWindow", this);
+    public String getWindowName() {
+        return "robotPositionWindow";
     }
 }
