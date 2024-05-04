@@ -13,7 +13,6 @@ import java.util.concurrent.locks.ReentrantLock;
 public class LogWindowSource{
     private final PropertyChangeSupport support = new PropertyChangeSupport(this);
     private final CircleQueue<LogEntry> messages;
-    private final Lock lock = new ReentrantLock();
     
     public LogWindowSource(int iQueueLength){
         messages = new CircleQueue<>(iQueueLength);
@@ -23,62 +22,37 @@ public class LogWindowSource{
      * Добавляет слушателя
      */
     public void addPropertyChangeListener(PropertyChangeListener listener){
-        lock.lock();
-        try{
-            support.addPropertyChangeListener(listener);
-        }finally {
-            lock.unlock();
-        }
+        support.addPropertyChangeListener(listener);
     }
 
     /**
      * Удаляет слушателя
      */
     public void removePropertyChangeListener(PropertyChangeListener listener){
-        lock.lock();
-        try{
-            support.removePropertyChangeListener(listener);
-        }finally {
-            lock.unlock();
-        }
+        support.removePropertyChangeListener(listener);
     }
 
     /**
      * Добавляет сообщение в лог
      */
     public void append(LogLevel logLevel, String strMessage){
-        lock.lock();
-        try{
-            LogEntry entry = new LogEntry(logLevel, strMessage);
-            messages.append(entry);
-            support.firePropertyChange("logChange", null, null);
-        }finally {
-            lock.unlock();
-        }
+        LogEntry entry = new LogEntry(logLevel, strMessage);
+        messages.append(entry);
+        support.firePropertyChange("logChange", null, null);
     }
 
     /**
      * Возвращает итерируемый объект логов в промежутке от leftIndex до rightIndex, не включая rightIndex
      */
     public Iterable<LogEntry> range(int leftIndex, int rightIndex){
-        lock.lock();
-        try{
-            return messages.range(leftIndex, rightIndex);
-        }finally {
-            lock.unlock();
-        }
+        return messages.range(leftIndex, rightIndex);
     }
 
     /**
      * Возвращает итерируемый объект всех логов
      */
     public Iterable<LogEntry> all(){
-        lock.lock();
-        try{
-            return messages.all();
-        }finally {
-            lock.unlock();
-        }
+        return messages;
     }
 
     /**

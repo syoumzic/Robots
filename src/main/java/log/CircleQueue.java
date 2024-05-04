@@ -1,17 +1,19 @@
 package log;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Iterator;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Кольцевая очередь
  */
-public class CircleQueue<Type>{
-    private Type[] storage;
+public class CircleQueue<Type> implements Iterable<Type>{
+    private final Type[] storage;
     private int lastIndex;
     private int length;
-    private int capacity;
+    private final int capacity;
     private int shift;
+    private final Lock lock = new ReentrantLock();
 
     public CircleQueue(int capacity){
         if(capacity <= 0)
@@ -27,17 +29,20 @@ public class CircleQueue<Type>{
      * Добавление элемента в очередь
      */
     public void append(Type type){
-        storage[lastIndex] = type;
-        lastIndex = (lastIndex + 1) % capacity;
-        length = Math.min(length + 1, capacity);
-        shift = (lastIndex - length + capacity) % capacity;
+        lock.lock();
+        try {
+            storage[lastIndex] = type;
+            lastIndex = (lastIndex + 1) % capacity;
+            length = Math.min(length + 1, capacity);
+            shift = (lastIndex - length + capacity) % capacity;
+        }finally {
+            lock.unlock();
+        }
     }
 
-    /**
-     * Возвращение всех итерируемого объекта всех элементов очереди
-     */
-    public Iterable<Type> all(){
-        return new CircelQueueIterable<>(this, 0, length);
+    @Override
+    public Iterator<Type> iterator() {
+        return new CircleQueueIterator(0, length);
     }
 
     /**
@@ -47,16 +52,7 @@ public class CircleQueue<Type>{
         if(leftIndex > rightIndex || leftIndex < 0 || rightIndex > length)
             throw new ArrayIndexOutOfBoundsException();
 
-        return new CircelQueueIterable<>(this, leftIndex, rightIndex);
-    }
-
-    /**
-     * Возвращает значение по индексу
-     */
-    public Type get(int index) throws ArrayIndexOutOfBoundsException{
-        if(index < 0 || index >= length)
-            throw new ArrayIndexOutOfBoundsException();
-        return this.storage[(shift + index) % capacity];
+        return () -> new CircleQueueIterator(leftIndex, rightIndex);
     }
 
     /**
@@ -64,5 +60,40 @@ public class CircleQueue<Type>{
      */
     public int size(){
         return length;
+    }
+
+    /**
+     * Итератор для кольцевой очереди
+     */
+    private class CircleQueueIterator implements Iterator<Type> {
+        private int index;
+        private final int endIndex;
+
+        public CircleQueueIterator(int beginIndex, int endIndex){
+            this.index = beginIndex;
+            this.endIndex = endIndex;
+        }
+
+        @Override
+        public boolean hasNext() {
+            lock.lock();
+            try {
+                return index != endIndex;
+            }finally {
+                lock.unlock();
+            }
+        }
+
+        @Override
+        public Type next() {
+            lock.lock();
+            try {
+                Type type = storage[(shift + index) % capacity];
+                index += 1;
+                return type;
+            }finally {
+                lock.unlock();
+            }
+        }
     }
 }
