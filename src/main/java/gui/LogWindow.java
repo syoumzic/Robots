@@ -11,14 +11,14 @@ import javax.swing.JInternalFrame;
 import javax.swing.JPanel;
 
 import log.Logger;
+import utils.Localizable;
 import utils.Savable;
-import utils.WindowsManager;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.NoSuchElementException;
+import java.util.ResourceBundle;
 
-public class LogWindow extends JInternalFrame implements PropertyChangeListener, Savable {
+public class LogWindow extends JInternalFrame implements PropertyChangeListener, Savable, Localizable {
     private LogWindowSource m_logSource;
     private TextArea m_logContent;
 
@@ -26,7 +26,6 @@ public class LogWindow extends JInternalFrame implements PropertyChangeListener,
         super("Протокол работы", true, true, true, true);
 
         pack();
-        Logger.debug("Протокол работает");
 
         m_logSource = Logger.getDefaultLogSource();
         m_logSource.addPropertyChangeListener(this);
@@ -43,6 +42,9 @@ public class LogWindow extends JInternalFrame implements PropertyChangeListener,
         setSize(300, 800);
     }
 
+    /**
+     * Обновление содержимого лога
+     */
     private void updateLogContent() {
         StringBuilder content = new StringBuilder();
         for (LogEntry entry : m_logSource.all()) {
@@ -55,6 +57,11 @@ public class LogWindow extends JInternalFrame implements PropertyChangeListener,
     @Override
     public String getWindowName() {
         return "logWindow";
+    }
+
+    @Override
+    public void onUpdateLocale(ResourceBundle bundle) {
+        setTitle(bundle.getString("title"));
     }
 
     @Override

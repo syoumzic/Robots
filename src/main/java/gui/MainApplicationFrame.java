@@ -13,12 +13,16 @@ import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
-import menu.CustomMenuBar;
+import gui.menu.CustomMenuBar;
 import java.io.IOException;
+import java.util.Locale;
+import java.util.MissingResourceException;
 import java.util.NoSuchElementException;
+import java.util.ResourceBundle;
 
-public class MainApplicationFrame extends JFrame
-{
+import utils.Localizable;
+
+public class MainApplicationFrame extends JFrame{
     private final JDesktopPane desktopPane = new JDesktopPane();
     private final WindowsManager windowsManager = new WindowsManager();
     private final FileManager fileManager = new FileManager();
@@ -46,8 +50,8 @@ public class MainApplicationFrame extends JFrame
 
         GameWindow gameWindow = new GameWindow(robotPositionWindow);
         addWindow(gameWindow);
-        loadWindowStates();
 
+        loadWindowStates();
 
         setJMenuBar(new CustomMenuBar(this));
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -58,13 +62,14 @@ public class MainApplicationFrame extends JFrame
             }
         });
 
+        setWindowsLocale(Locale.of("en"));
+
         pack();
         setVisible(true);
         setExtendedState(Frame.MAXIMIZED_BOTH);
     }
     
-    protected void addWindow(JInternalFrame frame)
-    {
+    protected void addWindow(JInternalFrame frame){
         desktopPane.add(frame);
         frame.setVisible(true);
     }
@@ -88,6 +93,31 @@ public class MainApplicationFrame extends JFrame
             saveState();
             setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             dispose();
+        }
+    }
+
+    /**
+     * Устанавливает локаль локализируемым окнам
+     */
+    public void setWindowsLocale(Locale locale){
+        for (Component component : desktopPane.getComponents()) {
+            try {
+                if (component instanceof Localizable localizable) {
+                    localizable.onUpdateLocale(ResourceBundle.getBundle(localizable.getWindowName(), locale));
+                } else if (component instanceof JInternalFrame.JDesktopIcon icon) {
+                    if (icon.getInternalFrame() instanceof Localizable localizable) {
+                        localizable.onUpdateLocale(ResourceBundle.getBundle(localizable.getWindowName(), locale));
+                    }
+                }
+            }catch (MissingResourceException e){
+                Logger.debug(e.toString());
+            }
+        }
+
+        for(Component component : getJMenuBar().getComponents()){
+            if(component instanceof  Localizable localizable){
+                localizable.onUpdateLocale(ResourceBundle.getBundle(localizable.getWindowName(), locale));
+            }
         }
     }
 
