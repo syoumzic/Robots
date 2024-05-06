@@ -10,7 +10,7 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 
 /**
- * Вкладка действия. Содержит список действий, которые можно сделать с окном
+ * Вкладка выбора языка интерфейса
  */
 public class LanguageMenu extends JMenu implements Localizable{
     public LanguageMenu(MainApplicationFrame mainApplicationFrame){
