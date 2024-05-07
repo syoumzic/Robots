@@ -22,10 +22,11 @@ import java.util.ResourceBundle;
 
 import utils.Localizable;
 
-public class MainApplicationFrame extends JFrame{
+public class MainApplicationFrame extends JFrame implements Localizable {
     private final JDesktopPane desktopPane = new JDesktopPane();
     private final WindowsManager windowsManager = new WindowsManager();
     private final FileManager fileManager = new FileManager();
+    private ResourceBundle bundle;
 
     public MainApplicationFrame() {
         int inset = 50;
@@ -78,11 +79,11 @@ public class MainApplicationFrame extends JFrame{
      * Метод подтверждения выхода
      */
     private void confirmExit() {
-        Object[] options1 = {"Да", "Нет"};
+        Object[] options1 = {bundle.getString("yesOption"), bundle.getString("noOption")};
 
         int option = JOptionPane.showOptionDialog(null,
-                "Вы действительно хотите выйти?",
-                "Подтверждение выхода",
+                bundle.getString("confirmExit"),
+                bundle.getString("confirmationExit"),
                 JOptionPane.YES_NO_CANCEL_OPTION,
                 JOptionPane.PLAIN_MESSAGE,
                 null,
@@ -115,10 +116,12 @@ public class MainApplicationFrame extends JFrame{
         }
 
         for(Component component : getJMenuBar().getComponents()){
-            if(component instanceof  Localizable localizable){
+            if(component instanceof Localizable localizable){
                 localizable.onUpdateLocale(ResourceBundle.getBundle(localizable.getWindowName(), locale));
             }
         }
+
+        onUpdateLocale(ResourceBundle.getBundle(this.getWindowName(), locale));
     }
 
     /**
@@ -157,5 +160,15 @@ public class MainApplicationFrame extends JFrame{
         }catch (NoSuchElementException e){
             Logger.error("не удалось загрузить окна");
         }
+    }
+
+    @Override
+    public String getWindowName() {
+        return "mainWindow";
+    }
+
+    @Override
+    public void onUpdateLocale(ResourceBundle bundle) {
+        this.bundle = bundle;
     }
 }
