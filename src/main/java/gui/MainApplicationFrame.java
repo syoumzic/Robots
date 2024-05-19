@@ -4,9 +4,7 @@ import java.awt.Dimension;
 import java.awt.Toolkit;
 
 import log.Logger;
-import utils.FileManager;
-import utils.Savable;
-import utils.WindowsManager;
+import utils.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -15,18 +13,14 @@ import java.awt.event.WindowEvent;
 
 import gui.menu.CustomMenuBar;
 import java.io.IOException;
-import java.util.Locale;
-import java.util.MissingResourceException;
-import java.util.NoSuchElementException;
-import java.util.ResourceBundle;
-
-import utils.Localizable;
+import java.util.*;
 
 public class MainApplicationFrame extends JFrame implements Localizable {
     private final JDesktopPane desktopPane = new JDesktopPane();
     private final WindowsManager windowsManager = new WindowsManager();
     private final FileManager fileManager = new FileManager();
     private ResourceBundle bundle;
+    private final LocalizationManager localizationManager = new LocalizationManager();
 
     public MainApplicationFrame() {
         int inset = 50;
@@ -40,7 +34,7 @@ public class MainApplicationFrame extends JFrame implements Localizable {
         try {
             windowsManager.setStorage(fileManager.loadWindowPreference());
         }catch(IOException e){
-            Logger.error(e.toString());
+            Logger.error("не удалось загрузить конфигурацию окон");
         }
 
         LogWindow logWindow = new LogWindow();
@@ -63,7 +57,7 @@ public class MainApplicationFrame extends JFrame implements Localizable {
             }
         });
 
-        setWindowsLocale(Locale.of("en"));
+        setWindowsLocale(Locale.of("ru"));
 
         pack();
         setVisible(true);
@@ -102,26 +96,17 @@ public class MainApplicationFrame extends JFrame implements Localizable {
      */
     public void setWindowsLocale(Locale locale){
         for (Component component : desktopPane.getComponents()) {
-            try {
-                if (component instanceof Localizable localizable) {
-                    localizable.onUpdateLocale(ResourceBundle.getBundle(localizable.getWindowName(), locale));
-                } else if (component instanceof JInternalFrame.JDesktopIcon icon) {
-                    if (icon.getInternalFrame() instanceof Localizable localizable) {
-                        localizable.onUpdateLocale(ResourceBundle.getBundle(localizable.getWindowName(), locale));
-                    }
-                }
-            }catch (MissingResourceException e){
-                Logger.debug(e.toString());
+            localizationManager.localize(component, locale);
+            if (component instanceof JInternalFrame.JDesktopIcon icon) {
+                localizationManager.localize(icon.getInternalFrame(), locale);
             }
         }
 
-        for(Component component : getJMenuBar().getComponents()){
-            if(component instanceof Localizable localizable){
-                localizable.onUpdateLocale(ResourceBundle.getBundle(localizable.getWindowName(), locale));
-            }
+        for (Component component : getJMenuBar().getComponents()) {
+            localizationManager.localize(component, locale);
         }
 
-        onUpdateLocale(ResourceBundle.getBundle(this.getWindowName(), locale));
+        localizationManager.localize(this, locale);
     }
 
     /**
@@ -139,7 +124,7 @@ public class MainApplicationFrame extends JFrame implements Localizable {
             try {
                 fileManager.saveWindowPreferences(windowsManager.getStorage());
             }catch (IOException e){
-                Logger.error(e.toString());
+                Logger.error("Не удалось сохранить конфигурацию окон");
             }
         }
     }

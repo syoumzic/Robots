@@ -1,12 +1,14 @@
 package gui.menu;
 
 import gui.MainApplicationFrame;
+import log.Logger;
 import utils.Localizable;
 
 import javax.swing.*;
 
 import java.awt.event.KeyEvent;
 import java.util.Locale;
+import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 /**
@@ -26,7 +28,7 @@ public class LanguageMenu extends JMenu implements Localizable{
         }
 
         {
-            JMenuItem english = new JMenuItem("Транслит");
+            JMenuItem english = new JMenuItem("Transliteraciya");
             english.addActionListener((event) -> {
                 mainApplicationFrame.setWindowsLocale(Locale.of("en"));
             });
@@ -43,7 +45,5 @@ public class LanguageMenu extends JMenu implements Localizable{
     @Override
     public void onUpdateLocale(ResourceBundle bundle) {
         setText(bundle.getString("title"));
-        getItem(0).setText(bundle.getString("russianLanguage"));
-        getItem(1).setText(bundle.getString("transliterateLanguage"));
     }
 }
