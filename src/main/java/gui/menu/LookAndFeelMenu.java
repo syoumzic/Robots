@@ -1,16 +1,18 @@
-package menu;
+package gui.menu;
+
+import utils.Localizable;
 
 import javax.swing.*;
 import java.awt.event.KeyEvent;
+import java.util.ResourceBundle;
 
 /**
  * Меню настройки темы окна. Содержит различные темы
  */
-public class LookAndFeelMenu extends JMenu {
+public class LookAndFeelMenu extends JMenu implements Localizable {
     LookAndFeelMenu(JFrame mainFrame){
         super("Режим отображения");
         setMnemonic(KeyEvent.VK_V);
-        getAccessibleContext().setAccessibleDescription("Управление режимом отображения приложения");
         
         UIManager.LookAndFeelInfo[] looks = UIManager.getInstalledLookAndFeels();
         for (UIManager.LookAndFeelInfo look : looks){
@@ -30,5 +32,15 @@ public class LookAndFeelMenu extends JMenu {
             });
             add(systemLookAndFeel);
         }
+    }
+
+    @Override
+    public String getWindowName() {
+        return "lookAndFeelMenu";
+    }
+
+    @Override
+    public void onUpdateLocale(ResourceBundle bundle) {
+        setText(bundle.getString("title"));
     }
 }

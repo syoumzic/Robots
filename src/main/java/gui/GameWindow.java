@@ -6,17 +6,16 @@ import game.GameVisualizer;
 
 import java.awt.BorderLayout;
 import java.beans.PropertyChangeListener;
+
+import utils.Localizable;
 import utils.Savable;
-import utils.WindowsManager;
 
 import javax.swing.*;
-import java.util.NoSuchElementException;
+import java.util.ResourceBundle;
 
-public class GameWindow extends JInternalFrame implements Savable
-{
+public class GameWindow extends JInternalFrame implements Savable, Localizable {
 
-    public GameWindow(PropertyChangeListener positionListener)
-    {
+    public GameWindow(PropertyChangeListener positionListener){
         super("Игровое поле", true, true, true, true);
 
         GameVisualizer visualizer = new GameVisualizer();
@@ -24,6 +23,7 @@ public class GameWindow extends JInternalFrame implements Savable
         GameModel model = new GameModel();
         model.addPropertyChangeListener(positionListener);
         model.addPropertyChangeListener(visualizer);
+        model.notifyChange();
 
         GameController controller = new GameController(this, model);
 
@@ -39,5 +39,10 @@ public class GameWindow extends JInternalFrame implements Savable
     @Override
     public String getWindowName() {
         return "gameWindow";
+    }
+
+    @Override
+    public void onUpdateLocale(ResourceBundle bundle) {
+        setTitle(bundle.getString("title"));
     }
 }

@@ -1,6 +1,5 @@
 package gui;
 
-import log.LogChangeListener;
 import log.LogEntry;
 import log.LogWindowSource;
 
@@ -12,12 +11,14 @@ import javax.swing.JInternalFrame;
 import javax.swing.JPanel;
 
 import log.Logger;
+import utils.Localizable;
 import utils.Savable;
-import utils.WindowsManager;
 
-import java.util.NoSuchElementException;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.util.ResourceBundle;
 
-public class LogWindow extends JInternalFrame implements LogChangeListener, Savable {
+public class LogWindow extends JInternalFrame implements PropertyChangeListener, Savable, Localizable {
     private LogWindowSource m_logSource;
     private TextArea m_logContent;
 
@@ -25,10 +26,9 @@ public class LogWindow extends JInternalFrame implements LogChangeListener, Sava
         super("Протокол работы", true, true, true, true);
 
         pack();
-        Logger.debug("Протокол работает");
 
         m_logSource = Logger.getDefaultLogSource();
-        m_logSource.registerListener(this);
+        m_logSource.addPropertyChangeListener(this);
         m_logContent = new TextArea("");
         m_logContent.setSize(200, 500);
 
@@ -42,6 +42,9 @@ public class LogWindow extends JInternalFrame implements LogChangeListener, Sava
         setSize(300, 800);
     }
 
+    /**
+     * Обновление содержимого лога
+     */
     private void updateLogContent() {
         StringBuilder content = new StringBuilder();
         for (LogEntry entry : m_logSource.all()) {
@@ -52,12 +55,17 @@ public class LogWindow extends JInternalFrame implements LogChangeListener, Sava
     }
 
     @Override
-    public void onLogChanged() {
-        EventQueue.invokeLater(this::updateLogContent);
+    public String getWindowName() {
+        return "logWindow";
     }
 
     @Override
-    public String getWindowName() {
-        return "logWindow";
+    public void onUpdateLocale(ResourceBundle bundle) {
+        setTitle(bundle.getString("title"));
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        EventQueue.invokeLater(this::updateLogContent);
     }
 }
