@@ -15,12 +15,18 @@ import gui.menu.CustomMenuBar;
 import java.io.IOException;
 import java.util.*;
 
+import java.util.Locale;
+import java.util.MissingResourceException;
+import java.util.NoSuchElementException;
+import java.util.ResourceBundle;
+
 public class MainApplicationFrame extends JFrame implements Localizable {
     private final JDesktopPane desktopPane = new JDesktopPane();
     private final WindowsManager windowsManager = new WindowsManager();
     private final FileManager fileManager = new FileManager();
     private ResourceBundle bundle;
     private final LocalizationManager localizationManager = new LocalizationManager();
+    private final ExtensionManager extensionManager;
 
     public MainApplicationFrame() {
         int inset = 50;
@@ -44,11 +50,12 @@ public class MainApplicationFrame extends JFrame implements Localizable {
         addWindow(robotPositionWindow);
 
         GameWindow gameWindow = new GameWindow(robotPositionWindow);
+        extensionManager = new ExtensionManager(gameWindow);
         addWindow(gameWindow);
 
         loadWindowStates();
 
-        setJMenuBar(new CustomMenuBar(this));
+        setJMenuBar(new CustomMenuBar(this, extensionManager));
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
             @Override

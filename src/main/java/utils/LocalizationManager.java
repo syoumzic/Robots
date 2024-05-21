@@ -11,7 +11,7 @@ public class LocalizationManager {
     public void localize(Component component, Locale locale){
         if(component instanceof Localizable localizable){
             try {
-                localizable.onUpdateLocale(ResourceBundle.getBundle(localizable.getWindowName(), locale));
+                localizable.onUpdateLocale(ResourceBundle.getBundle("bundles/%s".formatted(localizable.getWindowName()), locale));
             }catch (MissingResourceException e){
                 if(e.getKey().isEmpty()) {
                     Logger.error("ресурс '%s' не найден".formatted(e.getClassName()));

@@ -14,14 +14,14 @@ public class GameController {
     private GameModel model;
     private Timer timer;
 
-    public GameController(GameWindow gameWindow, GameModel model) {
-        this.model = model;
-
+    public GameController(GameWindow gameWindow) {
         timer = new Timer("events generator", true);
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                model.onModelUpdateEvent();
+                if(model != null) {
+                    model.onModelUpdateEvent();
+                }
             }
         }, 0, 50);
 
@@ -31,5 +31,9 @@ public class GameController {
                 model.setTargetPosition(e.getPoint());
             }
         });
+    }
+
+    public void setModel(GameModel model) {
+        this.model = model;
     }
 }
